@@ -1,0 +1,315 @@
+/**
+ * RTI Assist API Client
+ * Base URL configured from Vite environment: import.meta.env.VITE_API_URL
+ * Feature Flag configured from Vite environment: import.meta.env.VITE_USE_MOCK
+ */
+
+import * as mockApi from './mockApi.js';
+
+// Feature Flag: switch between real and mock implementations
+export const isMockEnabled =
+  import.meta.env.VITE_USE_MOCK === 'true' ||
+  import.meta.env.VITE_USE_MOCK === true ||
+  import.meta.env.VITE_USE_MOCK === '1';
+
+const BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000/api').replace(/\/+$/, '');
+
+export class ApiError extends Error {
+  constructor(statusCode, message, code = 'API_ERROR', details) {
+    super(message);
+    this.name = 'ApiError';
+    this.statusCode = statusCode;
+    this.code = code;
+    this.details = details;
+  }
+}
+
+export const AUTH_TOKEN_KEY = 'rti_assist_token';
+export const AUTH_USER_KEY = 'rti_assist_user';
+
+export function getAuthToken() {
+  try {
+    return localStorage.getItem(AUTH_TOKEN_KEY) || null;
+  } catch {
+    return null;
+  }
+}
+
+async function request(endpoint, options = {}) {
+  const { params, body, headers, ...restOptions } = options;
+
+  let url = `${BASE_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
+  if (params) {
+    const searchParams = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        searchParams.append(key, String(value));
+      }
+    });
+    const queryString = searchParams.toString();
+    if (queryString) {
+      url += (url.includes('?') ? '&' : '?') + queryString;
+    }
+  }
+
+  const token = getAuthToken();
+
+  const finalHeaders = {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...headers,
+  };
+
+  const config = {
+    ...restOptions,
+    headers: finalHeaders,
+  };
+
+  if (body !== undefined) {
+    config.body = JSON.stringify(body);
+  }
+
+  try {
+    const res = await fetch(url, config);
+
+    if (!res.ok) {
+      let errorData = {
+        code: 'HTTP_ERROR',
+        message: `HTTP ${res.status}: ${res.statusText}`,
+        statusCode: res.status,
+      };
+
+      try {
+        const parsed = await res.json();
+        if (parsed.message) errorData.message = parsed.message;
+        if (parsed.code) errorData.code = parsed.code;
+        if (parsed.details) errorData.details = parsed.details;
+      } catch {
+        const text = await res.text().catch(() => null);
+        if (text) errorData.message = text;
+      }
+
+      throw new ApiError(res.status, errorData.message, errorData.code, errorData.details);
+    }
+
+    const contentType = res.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      const json = await res.json();
+      if (json && typeof json === 'object' && 'data' in json && 'success' in json) {
+        return json.data;
+      }
+      return json;
+    }
+
+    return await res.text();
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    throw new ApiError(
+      0,
+      error instanceof Error ? error.message : 'Unknown network error occurred',
+      'NETWORK_ERROR'
+    );
+  }
+}
+
+// Low-level fetch client export
+export const api = {
+  get: (endpoint, options) => request(endpoint, { ...options, method: 'GET' }),
+  post: (endpoint, body, options) => request(endpoint, { ...options, method: 'POST', body }),
+  put: (endpoint, body, options) => request(endpoint, { ...options, method: 'PUT', body }),
+  patch: (endpoint, body, options) => request(endpoint, { ...options, method: 'PATCH', body }),
+  delete: (endpoint, options) => request(endpoint, { ...options, method: 'DELETE' }),
+  getBaseUrl: () => BASE_URL,
+};
+
+// ==========================================
+// UNIFIED API / MOCK SWITCHING FUNCTIONS
+// ==========================================
+
+export async function getAuthorities(params) {
+  if (isMockEnabled) {
+    return mockApi.getAuthorities(params);
+  }
+  return api.get('/authorities', { params });
+}
+
+export async function createCase(data) {
+  if (isMockEnabled) {
+    return mockApi.createCase(data);
+  }
+  return api.post('/cases', data);
+}
+
+export async function getCase(id) {
+  if (isMockEnabled) {
+    return mockApi.getCase(id);
+  }
+  return api.get(`/cases/${id}`);
+}
+
+export async function updateCase(id, updates) {
+  if (isMockEnabled) {
+    return mockApi.updateCase(id, updates);
+  }
+  return api.patch(`/cases/${id}`, updates);
+}
+
+export async function listCases(params) {
+  if (isMockEnabled) {
+    return mockApi.listCases(params);
+  }
+  return api.get('/cases', { params });
+}
+
+export async function getDeadlines(params) {
+  if (isMockEnabled) {
+    return mockApi.getDeadlines(params);
+  }
+  return api.get('/deadlines', { params });
+}
+
+export async function createAppealDraft(data) {
+  if (isMockEnabled) {
+    return mockApi.createAppealDraft(data);
+  }
+  return api.post('/appeals', data);
+}
+
+/**
+ * Retry-once-on-failure wrapper for transient network or 5xx failures
+ */
+export async function withRetry(fn, retries = 1, delayMs = 500) {
+  let attempt = 0;
+  while (true) {
+    try {
+      return await fn();
+    } catch (error) {
+      attempt++;
+      if (attempt > retries) {
+        throw error;
+      }
+      console.warn(`[RTI Assist API] Request failed (attempt ${attempt}/${retries + 1}). Retrying in ${delayMs}ms...`, error);
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+    }
+  }
+}
+
+export async function draftRequest(concern) {
+  const query = typeof concern === 'string' ? concern.trim() : (concern?.concern || concern?.title || '');
+  if (!query) {
+    throw new ApiError(400, 'Concern description must be a non-empty string', 'VALIDATION_ERROR');
+  }
+
+  return withRetry(async () => {
+    if (isMockEnabled) {
+      const mockResult = await mockApi.draftRequest(query);
+      return {
+        category: mockResult.category || 'Public Administration',
+        draftText: typeof mockResult === 'string' ? mockResult : (mockResult.draftText || mockResult.sampleLetterDraft || ''),
+        suggestedAuthorityType: mockResult.suggestedAuthorityType || (mockResult.recommendedAuthority?.level || 'central'),
+      };
+    }
+
+    try {
+      return await api.post('/draft-request', { concern: query });
+    } catch (err) {
+      const message = err instanceof ApiError ? err.message : (err?.message || 'Failed to generate RTI draft from backend AI service');
+      const statusCode = err?.statusCode || 500;
+      throw new ApiError(statusCode, `Backend AI Service Error: ${message}`, 'AI_DRAFT_FAILED', err);
+    }
+  }, 1, 500);
+}
+
+export async function draftAppeal(caseId, appealType = 'first_appeal', caseDetails = null) {
+  if (!caseId) {
+    throw new ApiError(400, 'Case ID is required to draft an appeal', 'VALIDATION_ERROR');
+  }
+
+  return withRetry(async () => {
+    if (isMockEnabled) {
+      const mockResult = await mockApi.draftAppeal(caseId, appealType, caseDetails);
+      return {
+        draftText: typeof mockResult === 'string' ? mockResult : (mockResult.draftText || mockResult.draftContent || ''),
+      };
+    }
+
+    try {
+      return await api.post('/draft-appeal', {
+        caseId,
+        appealType,
+        caseDetails,
+      });
+    } catch (err) {
+      const message = err instanceof ApiError ? err.message : (err?.message || 'Failed to generate appeal draft from backend AI service');
+      const statusCode = err?.statusCode || 500;
+      throw new ApiError(statusCode, `Backend AI Service Error: ${message}`, 'AI_APPEAL_DRAFT_FAILED', err);
+    }
+  }, 1, 500);
+}
+
+export async function recommendAuthority(draftText) {
+  if (isMockEnabled) {
+    return mockApi.recommendAuthority(draftText);
+  }
+  return api.post('/cases/recommend-authority', typeof draftText === 'string' ? { draftText } : draftText);
+}
+
+
+// Attach helpers directly on api object so api.draftRequest(...) and api.recommendAuthority(...) can be called
+api.draftRequest = draftRequest;
+api.recommendAuthority = recommendAuthority;
+api.getAuthorities = getAuthorities;
+api.createCase = createCase;
+api.getCase = getCase;
+api.updateCase = updateCase;
+api.listCases = listCases;
+api.getDeadlines = getDeadlines;
+api.createAppealDraft = createAppealDraft;
+api.draftAppeal = draftAppeal;
+
+
+export const casesApi = {
+  list: listCases,
+  getById: getCase,
+  create: createCase,
+  update: (id, updates) =>
+    isMockEnabled
+      ? mockApi.getCase(id).then((c) => ({ ...c, ...updates }))
+      : api.patch(`/cases/${id}`, updates),
+  delete: (id) =>
+    isMockEnabled
+      ? Promise.resolve({ success: true })
+      : api.delete(`/cases/${id}`),
+};
+
+export const authoritiesApi = {
+  list: getAuthorities,
+  getById: (id) =>
+    isMockEnabled
+      ? mockApi.getAuthorities().then((list) => {
+          const found = list.find((a) => a.id === id);
+          if (!found) throw new Error(`Authority ${id} not found`);
+          return found;
+        })
+      : api.get(`/authorities/${id}`),
+};
+
+export const deadlinesApi = {
+  list: getDeadlines,
+  markCompleted: (id) =>
+    isMockEnabled
+      ? Promise.resolve({ success: true })
+      : api.patch(`/deadlines/${id}/complete`),
+};
+
+export const appealsApi = {
+  getById: (id) =>
+    isMockEnabled
+      ? mockApi.getDeadlines().then(() => mockApi.createAppealDraft({ id }))
+      : api.get(`/appeals/${id}`),
+  create: createAppealDraft,
+  generateFromCase: draftAppeal,
+};
