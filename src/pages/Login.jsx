@@ -59,37 +59,37 @@ export const Login = () => {
   };
 
   return (
-    <div className="min-h-[75vh] flex items-center justify-center py-10 px-4">
+    <div className="min-h-[75vh] flex items-center justify-center py-12 px-4 font-sans">
       <div className="max-w-md w-full space-y-6">
         {/* Top Header Card */}
-        <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-cyan-950/80 border border-cyan-800/60 text-cyan-400 mb-2 shadow-lg shadow-cyan-950/40">
+        <div className="text-center space-y-3">
+          <div className="inline-flex items-center justify-center w-12 h-12 border-2 border-[var(--border)] bg-[var(--primary)] text-[var(--primary-foreground)] shadow-[2px_2px_0px_0px_var(--shadow-color)]">
             <KeyRound className="w-6 h-6" />
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-black text-[var(--foreground)] tracking-tight">
             Sign In to RTI Assist
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400 max-w-sm mx-auto">
+          <p className="text-xs sm:text-sm text-[var(--muted-foreground)] font-medium max-w-sm mx-auto">
             Securely manage public records petitions, track 30-day deadlines, and generate First Appeals.
           </p>
         </div>
 
         {/* Login Form Container */}
-        <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6">
+        <div className="border-2 border-[var(--border)] bg-[var(--card)] p-6 sm:p-8 shadow-[6px_6px_0px_0px_var(--shadow-color)] space-y-6">
           {error && (
-            <div className="p-3.5 rounded-xl bg-rose-950/60 border border-rose-800/80 text-rose-300 text-xs flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
+            <div className="p-3.5 border-2 border-[var(--border)] bg-rose-50 text-rose-900 text-xs font-bold flex items-center gap-2 shadow-[2px_2px_0px_0px_var(--shadow-color)]">
+              <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
               <span>{error}</span>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
-              <label htmlFor="email" className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+              <label htmlFor="email" className="block text-xs font-bold text-[var(--foreground)] uppercase tracking-wider">
                 Email Address
               </label>
               <div className="relative">
-                <Mail className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                <Mail className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]" />
                 <input
                   id="email"
                   type="email"
@@ -97,24 +97,24 @@ export const Login = () => {
                   placeholder="applicant@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition"
+                  className="w-full pl-10 pr-4 py-2.5 border-2 border-[var(--border)] bg-[var(--background)] text-sm text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none shadow-[2px_2px_0px_0px_var(--shadow-color)] font-medium transition"
                 />
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <label htmlFor="password" className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+              <label htmlFor="password" className="block text-xs font-bold text-[var(--foreground)] uppercase tracking-wider">
                 Password
               </label>
               <div className="relative">
-                <Lock className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                <Lock className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]" />
                 <input
                   id="password"
                   type="password"
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition"
+                  className="w-full pl-10 pr-4 py-2.5 border-2 border-[var(--border)] bg-[var(--background)] text-sm text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none shadow-[2px_2px_0px_0px_var(--shadow-color)] font-medium transition"
                 />
               </div>
             </div>
@@ -122,7 +122,7 @@ export const Login = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 shadow-lg shadow-cyan-900/30 transition transform active:scale-95 disabled:opacity-50 mt-2"
+              className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 border-2 border-[var(--border)] text-sm font-bold text-[var(--primary-foreground)] bg-[var(--primary)] hover:bg-[var(--accent)] hover:text-[var(--accent-foreground)] shadow-[3px_3px_0px_0px_var(--shadow-color)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all disabled:opacity-50 mt-2 cursor-pointer"
             >
               {loading ? (
                 <>
@@ -139,8 +139,8 @@ export const Login = () => {
           </form>
 
           {/* Quick Demo Sign In Button */}
-          <div className="pt-4 border-t border-slate-800 space-y-3">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block text-center">
+          <div className="pt-4 border-t-2 border-[var(--border)] space-y-3">
+            <span className="text-[10px] font-black uppercase tracking-wider text-[var(--muted-foreground)] block text-center">
               Or Sign In with Demo Account
             </span>
 
@@ -148,29 +148,29 @@ export const Login = () => {
               type="button"
               onClick={() => handleQuickDemoLogin('vikram.roy@example.com', 'Vikramaditya Roy')}
               disabled={loading}
-              className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-700/80 text-xs transition group text-left"
+              className="w-full flex items-center justify-between p-3 border-2 border-[var(--border)] bg-[var(--background)] hover:bg-[var(--accent)] hover:text-[var(--accent-foreground)] text-xs shadow-[2px_2px_0px_0px_var(--shadow-color)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition group text-left cursor-pointer"
             >
               <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-lg bg-cyan-950 text-cyan-400 flex items-center justify-center border border-cyan-800/40">
+                <div className="w-7 h-7 border-2 border-[var(--border)] bg-[var(--secondary)] text-[var(--secondary-foreground)] flex items-center justify-center font-bold">
                   <ShieldCheck className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className="font-bold text-white group-hover:text-cyan-400 transition">
+                  <p className="font-bold text-[var(--foreground)] group-hover:text-[var(--accent-foreground)] transition">
                     Vikramaditya Roy
                   </p>
-                  <p className="text-[11px] text-slate-400">vikram.roy@example.com (Active Filings)</p>
+                  <p className="text-[11px] text-[var(--muted-foreground)] group-hover:text-[var(--accent-foreground)]">vikram.roy@example.com (Active Filings)</p>
                 </div>
               </div>
-              <Sparkles className="w-4 h-4 text-cyan-400 opacity-60 group-hover:opacity-100 transition" />
+              <Sparkles className="w-4 h-4 text-[var(--primary)] group-hover:text-[var(--accent-foreground)] transition" />
             </button>
           </div>
         </div>
 
         {/* Security / JWT Note */}
-        <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800 text-[11px] text-slate-400 flex items-center gap-2.5">
-          <ShieldCheck className="w-4 h-4 text-cyan-400 shrink-0" />
+        <div className="p-3.5 border-2 border-[var(--border)] bg-[var(--card)] text-[11px] font-medium text-[var(--foreground)] flex items-center gap-2.5 shadow-[2px_2px_0px_0px_var(--shadow-color)]">
+          <ShieldCheck className="w-4 h-4 text-[var(--secondary)] shrink-0" />
           <span>
-            Sessions use signed JWT authentication. Tokens are automatically attached as an <code className="text-cyan-300 font-mono">Authorization: Bearer &lt;token&gt;</code> header.
+            Sessions use signed JWT authentication. Tokens are automatically attached as an <code className="font-mono font-bold text-[var(--primary)]">Authorization: Bearer &lt;token&gt;</code> header.
           </span>
         </div>
       </div>

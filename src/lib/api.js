@@ -13,6 +13,7 @@ export const isMockEnabled =
   import.meta.env.VITE_USE_MOCK === '1';
 
 const BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000/api').replace(/\/+$/, '');
+const LLM_SERVICE_URL = (import.meta.env.VITE_LLM_SERVICE_URL || '').replace(/\/+$/, '');
 
 export class ApiError extends Error {
   constructor(statusCode, message, code = 'API_ERROR', details) {
@@ -204,6 +205,29 @@ export async function draftRequest(concern) {
   }
 
   return withRetry(async () => {
+    // 1. Prioritize calling the live LLM microservice if available
+    if (LLM_SERVICE_URL) {
+      try {
+        const res = await fetch(`${LLM_SERVICE_URL}/draft-request`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ concern: query }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          return {
+            category: data.category || 'other',
+            draftText: data.draftText || '',
+            suggestedAuthorityType: data.suggestedAuthorityType || 'Public Authority',
+            disclaimer: data.disclaimer || '',
+          };
+        }
+      } catch (llmErr) {
+        console.warn('[RTI Assist] Live LLM microservice unreachable for draft-request, checking fallback:', llmErr?.message);
+      }
+    }
+
+    // 2. Fallback to mock implementation if mock is enabled
     if (isMockEnabled) {
       const mockResult = await mockApi.draftRequest(query);
       return {
@@ -213,6 +237,7 @@ export async function draftRequest(concern) {
       };
     }
 
+    // 3. Fallback to standard backend URL
     try {
       return await api.post('/draft-request', { concern: query });
     } catch (err) {
@@ -229,6 +254,39 @@ export async function draftAppeal(caseId, appealType = 'first_appeal', caseDetai
   }
 
   return withRetry(async () => {
+    const formattedAppealType = String(appealType).toLowerCase().includes('second') ? 'second' : 'first';
+    const formattedCaseDetails = {
+      registrationNumber: caseDetails?.trackingNumber || caseDetails?.registrationNumber || caseDetails?.id || String(caseId),
+      filingDate: caseDetails?.filingDate || caseDetails?.filedAt || caseDetails?.createdAt || new Date().toISOString().split('T')[0],
+      authorityName: caseDetails?.authority?.name || caseDetails?.authorityName || (typeof caseDetails?.authority === 'string' ? caseDetails.authority : 'Concerned Public Authority'),
+      originalRequestText: caseDetails?.originalRequestText || (Array.isArray(caseDetails?.queries) ? caseDetails.queries.join('\n') : caseDetails?.description) || caseDetails?.summary || 'Information requested under RTI Act, 2005.',
+      responseReceived: caseDetails?.responseReceived || caseDetails?.pioResponse?.content || '',
+    };
+
+    // 1. Prioritize calling the live LLM microservice if available
+    if (LLM_SERVICE_URL) {
+      try {
+        const res = await fetch(`${LLM_SERVICE_URL}/draft-appeal`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            appealType: formattedAppealType,
+            caseDetails: formattedCaseDetails,
+          }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          return {
+            draftText: data.draftText || '',
+            disclaimer: data.disclaimer || '',
+          };
+        }
+      } catch (llmErr) {
+        console.warn('[RTI Assist] Live LLM microservice unreachable for draft-appeal, checking fallback:', llmErr?.message);
+      }
+    }
+
+    // 2. Fallback to mock implementation if mock is enabled
     if (isMockEnabled) {
       const mockResult = await mockApi.draftAppeal(caseId, appealType, caseDetails);
       return {
@@ -236,11 +294,12 @@ export async function draftAppeal(caseId, appealType = 'first_appeal', caseDetai
       };
     }
 
+    // 3. Fallback to standard backend URL
     try {
       return await api.post('/draft-appeal', {
         caseId,
-        appealType,
-        caseDetails,
+        appealType: formattedAppealType,
+        caseDetails: formattedCaseDetails,
       });
     } catch (err) {
       const message = err instanceof ApiError ? err.message : (err?.message || 'Failed to generate appeal draft from backend AI service');

@@ -1,34 +1,208 @@
 @import "tailwindcss";
 
-@layer base {
-  :root {
-    --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  }
+:root {
+  --card: #ffffff;
+  --ring: #2563eb;
+  --input: #e2e8f0;
+  --muted: #f1f5f9;
+  --accent: #ffa600;
+  --border: #e2e8f0;
+  --radius: 12px;
+  --chart-1: #ef4444;
+  --chart-2: #eab308;
+  --chart-3: #3b82f6;
+  --chart-4: #10b981;
+  --chart-5: #8b5cf6;
+  --popover: #ffffff;
+  --primary: #004bad;
+  --sidebar: #f8fafc;
+  --spacing: 0.25rem;
+  --font-mono: ui-monospace, SFMono-Regular, monospace;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --secondary: #00b800;
+  --background: #f8fafc;
+  --font-serif: ui-serif, Georgia, serif;
+  --foreground: #0f172a;
+  --destructive: #ef4444;
+  --shadow-blur: 8px;
+  --shadow-color: rgba(0, 0, 0, 0.06);
+  --sidebar-ring: #ff3333;
+  --shadow-spread: 0px;
+  --letter-spacing: 0em;
+  --shadow-opacity: 0.1;
+  --sidebar-accent: #0066ff;
+  --sidebar-border: #e2e8f0;
+  --card-foreground: #0f172a;
+  --shadow-offset-x: 0px;
+  --shadow-offset-y: 2px;
+  --sidebar-primary: #ff3333;
+  --muted-foreground: #64748b;
+  --accent-foreground: #000000;
+  --popover-foreground: #0f172a;
+  --primary-foreground: #ffffff;
+  --sidebar-foreground: #0f172a;
+  --secondary-foreground: #ffffff;
+  --destructive-foreground: #ffffff;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-primary-foreground: #ffffff;
+}
 
+.dark {
+  --card: #121826;
+  --ring: #3b82f6;
+  --input: #1e293b;
+  --muted: #1e293b;
+  --accent: #ffa600;
+  --border: rgba(255, 255, 255, 0.1);
+  --radius: 12px;
+  --chart-1: #f87171;
+  --chart-2: #facc15;
+  --chart-3: #60a5fa;
+  --chart-4: #34d399;
+  --chart-5: #c084fc;
+  --popover: #121826;
+  --primary: #3b82f6;
+  --sidebar: #0b0f19;
+  --spacing: 0.25rem;
+  --font-mono: ui-monospace, SFMono-Regular, monospace;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --secondary: #10b981;
+  --background: #0b0f19;
+  --font-serif: ui-serif, Georgia, serif;
+  --foreground: #f8fafc;
+  --destructive: #ef4444;
+  --shadow-blur: 12px;
+  --shadow-color: rgba(0, 0, 0, 0.4);
+  --sidebar-ring: #ff6666;
+  --shadow-spread: 0px;
+  --letter-spacing: 0em;
+  --shadow-opacity: 0.9;
+  --sidebar-accent: #3b82f6;
+  --sidebar-border: #ffffff;
+  --card-foreground: #f3f4f6;
+  --shadow-offset-x: 4px;
+  --shadow-offset-y: 4px;
+  --sidebar-primary: #ff6666;
+  --muted-foreground: #9ca3af;
+  --accent-foreground: #000000;
+  --popover-foreground: #f3f4f6;
+  --primary-foreground: #ffffff;
+  --sidebar-foreground: #f3f4f6;
+  --secondary-foreground: #ffffff;
+  --destructive-foreground: #ffffff;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-primary-foreground: #ffffff;
+}
+
+@theme inline {
+  --color-card: var(--card);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-border: var(--border);
+  --color-radius: var(--radius);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-popover: var(--popover);
+  --color-primary: var(--primary);
+  --color-sidebar: var(--sidebar);
+  --color-spacing: var(--spacing);
+  --color-font-mono: var(--font-mono);
+  --color-font-sans: var(--font-sans);
+  --color-secondary: var(--secondary);
+  --color-background: var(--background);
+  --color-font-serif: var(--font-serif);
+  --color-foreground: var(--foreground);
+  --color-destructive: var(--destructive);
+  --color-shadow-blur: var(--shadow-blur);
+  --color-shadow-color: var(--shadow-color);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-shadow-spread: var(--shadow-spread);
+  --color-letter-spacing: var(--letter-spacing);
+  --color-shadow-opacity: var(--shadow-opacity);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-card-foreground: var(--card-foreground);
+  --color-shadow-offset-x: var(--shadow-offset-x);
+  --color-shadow-offset-y: var(--shadow-offset-y);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
   body {
+    background-color: var(--background);
+    color: var(--foreground);
     font-family: var(--font-sans);
-    background-color: #0c0f17;
-    color: #e2e8f0;
+    letter-spacing: var(--letter-spacing);
     margin: 0;
     padding: 0;
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+}
 
-  /* Custom subtle scrollbar */
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
   }
-  ::-webkit-scrollbar-track {
-    background: #0f172a;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: #334155;
-    border-radius: 3px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: #475569;
+  100% {
+    transform: translateX(-50%);
   }
 }
+
+@keyframes marquee-reverse {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 40s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+.animate-marquee-reverse {
+  display: flex;
+  width: max-content;
+  animation: marquee-reverse 40s linear infinite;
+}
+
+.animate-marquee-reverse:hover {
+  animation-play-state: paused;
+}
+
+.animate-marquee-fast {
+  display: flex;
+  width: max-content;
+  animation: marquee 25s linear infinite;
+}
+
+.animate-marquee-fast:hover {
+  animation-play-state: paused;
+}
+

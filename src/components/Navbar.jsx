@@ -1,123 +1,165 @@
-import { useState } from 'react';
-import { NavLink, Link, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import {
-  FileText,
-  PlusCircle,
-  LayoutDashboard,
-  Building2,
-  Menu,
-  X,
   Scale,
   Sparkles,
-  LogIn,
+  Menu,
+  X,
   LogOut,
   User as UserIcon,
+  ArrowRight,
+  LayoutDashboard,
+  Building2,
+  FileText,
+  Sun,
+  Moon
 } from 'lucide-react';
-import { isMockEnabled } from '../lib/api.js';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useTheme } from '../context/ThemeContext.jsx';
+import { isMockEnabled } from '../lib/api.js';
 
 export const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
-
   const { user, isAuthenticated, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 15);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const navLinks = [
-    { name: 'Home', path: '/', icon: Scale },
-    { name: 'New Request', path: '/intake', icon: PlusCircle },
-    { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-    { name: 'Directory', path: '/directory', icon: Building2 },
+    { name: 'How It Works', href: '/#how-it-works' },
+    { name: 'Features', href: '/#features' },
+    { name: 'Resources', href: '/#resources' },
+    { name: 'FAQs', href: '/#faqs' },
   ];
 
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-md bg-[#0c101c]/85 border-b border-slate-800/80">
+    <header
+      className={`sticky top-0 z-50 transition-all duration-200 border-b-2 border-[var(--border)] ${
+        scrolled
+          ? 'bg-[var(--card)]/95 backdrop-blur-md shadow-[0px_4px_0px_0px_var(--shadow-color)]'
+          : 'bg-[var(--card)] backdrop-blur-sm'
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Brand Logo */}
-          <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 via-sky-600 to-indigo-600 p-[1px] shadow-lg shadow-cyan-500/20">
-              <div className="w-full h-full bg-[#0c101c] rounded-[11px] flex items-center justify-center group-hover:bg-[#111627] transition">
-                <FileText className="w-5 h-5 text-cyan-400 transition-transform group-hover:scale-110" />
-              </div>
+        <div className="flex items-center justify-between h-18">
+          {/* Left: Brand Identity */}
+          <Link to="/" className="flex items-center gap-3 group focus:outline-none">
+            <div className="w-10 h-10 border-2 border-[var(--border)] bg-[var(--primary)] flex items-center justify-center text-[var(--primary-foreground)] shadow-[2px_2px_0px_0px_var(--shadow-color)] group-hover:bg-[var(--accent)] transition-all">
+              <Scale className="w-5 h-5 transition-transform group-hover:scale-110" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-bold text-lg tracking-tight text-white group-hover:text-cyan-400 transition-colors">
+                <span className="font-extrabold text-xl tracking-tight text-[var(--foreground)] group-hover:text-[var(--primary)] transition-colors">
                   RTI Assist
                 </span>
-                <span className="text-[10px] uppercase font-semibold tracking-wider px-1.5 py-0.5 rounded bg-cyan-950/80 text-cyan-400 border border-cyan-800/60">
+                <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 border border-[var(--border)] bg-[var(--accent)] text-[var(--accent-foreground)]">
                   Act 2005
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 hidden sm:block">Legal Automation & Tracking</p>
+              <p className="text-[11px] text-[var(--muted-foreground)] hidden sm:block font-medium">Right to Information Intelligence</p>
             </div>
           </Link>
 
-          {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center gap-1">
-            {navLinks.map((item) => {
-              const Icon = item.icon;
-              const isActive =
-                item.path === '/'
-                  ? location.pathname === '/'
-                  : location.pathname.startsWith(item.path);
-
-              return (
-                <NavLink
-                  key={item.path}
-                  to={item.path}
-                  className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium transition-all ${
-                    isActive
-                      ? 'bg-slate-800 text-cyan-400 shadow-inner shadow-black/30 border border-slate-700/60'
-                      : 'text-slate-300 hover:text-white hover:bg-slate-800/50'
+          {/* Center: SaaS Navigation */}
+          <nav className="hidden md:flex items-center gap-6">
+            {isAuthenticated ? (
+              <>
+                <Link
+                  to="/dashboard"
+                  className={`text-xs font-black uppercase tracking-wider flex items-center gap-1.5 px-3 py-1.5 border-2 border-[var(--border)] transition ${
+                    location.pathname === '/dashboard'
+                      ? 'bg-[var(--primary)] text-[var(--primary-foreground)] shadow-[2px_2px_0px_0px_var(--shadow-color)]'
+                      : 'bg-[var(--card)] text-[var(--foreground)] hover:bg-[var(--background)] shadow-[2px_2px_0px_0px_var(--shadow-color)]'
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-cyan-400' : 'text-slate-400'}`} />
-                  {item.name}
-                </NavLink>
-              );
-            })}
+                  <LayoutDashboard className="w-3.5 h-3.5" />
+                  <span>Dashboard</span>
+                </Link>
+
+                <Link
+                  to="/directory"
+                  className={`text-xs font-black uppercase tracking-wider flex items-center gap-1.5 px-3 py-1.5 border-2 border-[var(--border)] transition ${
+                    location.pathname === '/directory'
+                      ? 'bg-[var(--primary)] text-[var(--primary-foreground)] shadow-[2px_2px_0px_0px_var(--shadow-color)]'
+                      : 'bg-[var(--card)] text-[var(--foreground)] hover:bg-[var(--background)] shadow-[2px_2px_0px_0px_var(--shadow-color)]'
+                  }`}
+                >
+                  <Building2 className="w-3.5 h-3.5 text-[var(--muted-foreground)]" />
+                  <span>Authorities</span>
+                </Link>
+
+                <Link
+                  to="/rti-act"
+                  className={`text-xs font-black uppercase tracking-wider flex items-center gap-1.5 px-3 py-1.5 border-2 border-[var(--border)] transition ${
+                    location.pathname === '/rti-act'
+                      ? 'bg-[var(--primary)] text-[var(--primary-foreground)] shadow-[2px_2px_0px_0px_var(--shadow-color)]'
+                      : 'bg-[var(--card)] text-[var(--foreground)] hover:bg-[var(--background)] shadow-[2px_2px_0px_0px_var(--shadow-color)]'
+                  }`}
+                >
+                  <FileText className="w-3.5 h-3.5 text-[var(--muted-foreground)]" />
+                  <span>RTI Guide</span>
+                </Link>
+              </>
+            ) : (
+              <>
+                {navLinks.map((item) => (
+                  <a
+                    key={item.name}
+                    href={item.href}
+                    className="text-sm font-semibold text-[var(--foreground)] hover:text-[var(--primary)] transition-colors"
+                  >
+                    {item.name}
+                  </a>
+                ))}
+                <div className="h-4 w-px bg-[var(--border)]" />
+                <Link
+                  to="/directory"
+                  className="text-sm font-semibold text-[var(--foreground)] hover:text-[var(--primary)] flex items-center gap-1.5 transition-colors"
+                >
+                  <Building2 className="w-4 h-4 text-[var(--muted-foreground)]" />
+                  <span>Authorities</span>
+                </Link>
+              </>
+            )}
           </nav>
 
-          {/* Quick CTA & Status Indicator */}
-          <div className="hidden md:flex items-center gap-3">
-            <div
-              className={`flex items-center gap-2 px-2.5 py-1 rounded-full border text-xs ${
-                isMockEnabled
-                  ? 'bg-cyan-950/60 border-cyan-800/50 text-cyan-300'
-                  : 'bg-emerald-950/60 border-emerald-800/40 text-emerald-400'
-              }`}
-              title={isMockEnabled ? 'Running with mockApi.js (VITE_USE_MOCK=true)' : 'Connecting to real backend API'}
+          {/* Right: Actions, Theme Toggle & Primary CTA */}
+          <div className="hidden sm:flex items-center gap-3">
+            {/* Theme Toggle Button */}
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="p-2 border-2 border-[var(--border)] bg-[var(--background)] text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-[var(--accent-foreground)] transition shadow-[2px_2px_0px_0px_var(--shadow-color)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none flex items-center justify-center cursor-pointer"
+              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              aria-label="Toggle theme"
             >
-              <span
-                className={`w-2 h-2 rounded-full ${
-                  isMockEnabled ? 'bg-cyan-400 animate-pulse' : 'bg-emerald-400 animate-pulse'
-                }`}
-              ></span>
-              <span className="font-mono text-[11px]">
-                {isMockEnabled ? 'Mock Mode' : 'Live API'}
-              </span>
-            </div>
+              {theme === 'dark' ? (
+                <Sun className="w-4 h-4 text-amber-400" />
+              ) : (
+                <Moon className="w-4 h-4 text-slate-800" />
+              )}
+            </button>
 
-            <Link
-              to="/intake"
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold text-white bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 shadow-md shadow-cyan-900/30 transition transform active:scale-95"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Draft RTI</span>
-            </Link>
-
-            {/* User Session Profile & Logout / Login */}
             {isAuthenticated ? (
-              <div className="flex items-center gap-2 pl-2 border-l border-slate-800">
-                <div className="flex items-center gap-1.5 text-xs text-slate-300 bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800">
-                  <UserIcon className="w-3.5 h-3.5 text-cyan-400" />
-                  <span className="font-semibold max-w-[120px] truncate">{user?.name || 'Citizen'}</span>
-                </div>
-
+              <div className="flex items-center gap-3">
+                <Link
+                  to="/dashboard"
+                  className="flex items-center gap-2 px-3 py-1.5 border-2 border-[var(--border)] bg-[var(--background)] text-xs font-bold text-[var(--foreground)] shadow-[2px_2px_0px_0px_var(--shadow-color)] transition"
+                >
+                  <UserIcon className="w-3.5 h-3.5 text-[var(--primary)]" />
+                  <span className="max-w-[120px] truncate">{user?.name || 'Citizen'}</span>
+                </Link>
                 <button
                   onClick={logout}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition"
+                  className="p-1.5 border-2 border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--destructive)] hover:bg-rose-50 transition cursor-pointer"
                   title="Logout Session"
                 >
                   <LogOut className="w-4 h-4" />
@@ -126,19 +168,36 @@ export const Navbar = () => {
             ) : (
               <Link
                 to="/login"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 transition"
+                className="text-sm font-bold text-[var(--foreground)] hover:text-[var(--primary)] px-3.5 py-2 transition"
               >
-                <LogIn className="w-3.5 h-3.5 text-cyan-400" />
-                <span>Sign In</span>
+                Sign In
               </Link>
             )}
+
+            {/* Primary CTA: "Create an RTI" */}
+            <Link
+              to="/intake"
+              className="inline-flex items-center gap-2 px-4 py-2.5 border-2 border-[var(--border)] text-sm font-bold text-[var(--primary-foreground)] bg-[var(--primary)] hover:bg-[var(--accent)] hover:text-[var(--accent-foreground)] shadow-[3px_3px_0px_0px_var(--shadow-color)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Create an RTI</span>
+            </Link>
           </div>
 
-          {/* Mobile menu button */}
-          <div className="flex md:hidden">
+          {/* Mobile Menu Button + Mobile Theme Toggle */}
+          <div className="flex items-center gap-2 lg:hidden">
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="p-2 border-2 border-[var(--border)] bg-[var(--background)] text-[var(--foreground)]"
+              aria-label="Toggle theme"
+            >
+              {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-800" />}
+            </button>
+
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 focus:outline-none"
+              className="p-2 border-2 border-[var(--border)] bg-[var(--background)] text-[var(--foreground)]"
               aria-label="Toggle navigation menu"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -147,41 +206,68 @@ export const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile menu dropdown */}
+      {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-b border-slate-800 bg-[#0c101c]/95 backdrop-blur-xl px-4 pt-2 pb-4 space-y-1">
-          {navLinks.map((item) => {
-            const Icon = item.icon;
-            const isActive =
-              item.path === '/'
-                ? location.pathname === '/'
-                : location.pathname.startsWith(item.path);
-
-            return (
-              <NavLink
-                key={item.path}
-                to={item.path}
+        <div className="lg:hidden border-t-2 border-[var(--border)] bg-[var(--card)] px-4 pt-3 pb-6 space-y-3 shadow-[0px_4px_0px_0px_var(--shadow-color)]">
+          <div className="space-y-1">
+            {navLinks.map((item) => (
+              <a
+                key={item.name}
+                href={item.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-base font-medium transition ${
-                  isActive
-                    ? 'bg-slate-800 text-cyan-400 border border-slate-700/60'
-                    : 'text-slate-300 hover:bg-slate-800/60 hover:text-white'
-                }`}
+                className="block px-3 py-2.5 text-base font-bold text-[var(--foreground)] hover:bg-[var(--background)] transition"
               >
-                <Icon className="w-5 h-5 text-slate-400" />
                 {item.name}
-              </NavLink>
-            );
-          })}
-          <div className="pt-2">
+              </a>
+            ))}
+            <Link
+              to="/directory"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block px-3 py-2.5 text-base font-bold text-[var(--foreground)] hover:bg-[var(--background)] transition"
+            >
+              Public Authorities
+            </Link>
+            {isAuthenticated && (
+              <Link
+                to="/dashboard"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block px-3 py-2.5 text-base font-bold text-[var(--primary)] hover:bg-[var(--background)] transition"
+              >
+                My Dashboard
+              </Link>
+            )}
+          </div>
+
+          <div className="pt-3 border-t-2 border-[var(--border)] space-y-2">
             <Link
               to="/intake"
               onClick={() => setMobileMenuOpen(false)}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-medium text-sm text-white bg-gradient-to-r from-cyan-600 to-blue-600"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-[var(--border)] font-bold text-sm text-[var(--primary-foreground)] bg-[var(--primary)] shadow-[3px_3px_0px_0px_var(--shadow-color)]"
             >
-              <PlusCircle className="w-4 h-4" />
-              New RTI Request
+              <Sparkles className="w-4 h-4" />
+              <span>Create an RTI</span>
             </Link>
+
+            {isAuthenticated ? (
+              <button
+                onClick={() => {
+                  logout();
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-[var(--border)] font-bold text-sm text-[var(--destructive)] bg-[var(--card)]"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Sign Out ({user?.name || 'Citizen'})</span>
+              </button>
+            ) : (
+              <Link
+                to="/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-[var(--border)] font-bold text-sm text-[var(--foreground)] bg-[var(--background)] shadow-[2px_2px_0px_0px_var(--shadow-color)]"
+              >
+                <span>Sign In</span>
+              </Link>
+            )}
           </div>
         </div>
       )}

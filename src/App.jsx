@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext.jsx';
+import { ThemeProvider } from './context/ThemeContext.jsx';
 import { ProtectedRoute } from './components/ProtectedRoute.jsx';
 import { Layout } from './components/Layout.jsx';
 import { Home } from './pages/Home.jsx';
@@ -10,11 +11,18 @@ import { AppealDraftDetail } from './pages/AppealDraftDetail.jsx';
 import { Directory } from './pages/Directory.jsx';
 import { CaseFiling } from './pages/CaseFiling.jsx';
 import { Login } from './pages/Login.jsx';
+import { About } from './pages/About.jsx';
+import { Contact } from './pages/Contact.jsx';
+import { PrivacyPolicy } from './pages/PrivacyPolicy.jsx';
+import { TermsOfService } from './pages/TermsOfService.jsx';
+import { Disclaimer } from './pages/Disclaimer.jsx';
+import { RtiActGuide } from './pages/RtiActGuide.jsx';
 
 export function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
+    <ThemeProvider>
+      <AuthProvider>
+        <BrowserRouter>
         <Routes>
           <Route element={<Layout />}>
             {/* Public Routes */}
@@ -22,6 +30,12 @@ export function App() {
             <Route path="/intake" element={<Intake />} />
             <Route path="/directory" element={<Directory />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsOfService />} />
+            <Route path="/disclaimer" element={<Disclaimer />} />
+            <Route path="/rti-act" element={<RtiActGuide />} />
 
             {/* Protected Routes: /dashboard, /cases/*, /appeals/* */}
             <Route element={<ProtectedRoute />}>
@@ -37,6 +51,7 @@ export function App() {
         </Routes>
       </BrowserRouter>
     </AuthProvider>
+  </ThemeProvider>
   );
 }
 

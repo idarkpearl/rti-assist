@@ -1,8 +1,8 @@
 # RTI ASSIST — BACKEND HANDOVER & TECHNICAL SPECIFICATION REPORT
-**Target Architecture:** Spring Boot 3.x (Java 17/21) + PostgreSQL 15/16 + Spring Security + REST + LLM Client  
+**Target Architecture:** Flexible Backend (Node.js/Express, Python/FastAPI, or Spring Boot) + PostgreSQL / MongoDB + REST API + LLM Integration  
 **Author:** Antigravity AI (Frontend Architecture Audit)  
-**Date:** September 27, 2026  
-**Status:** READY FOR BACKEND IMPLEMENTATION (Frontend Complete & Frozen)
+**Date:** September 30, 2026  
+**Status:** READY FOR BACKEND IMPLEMENTATION (Frontend Standalone Mode Active)
 
 ---
 
@@ -20,7 +20,7 @@
 11. [Part 11: Boundaries: What to Leave Alone (Frontend Owned)](#part-11--what-to-leave-alone)
 12. [Part 12: Do Not Do Yet — Final Integration Protocol](#part-12--do-not-do-yet--final-integration)
 13. [Part 13: Core Architectural Flow Diagrams](#part-13--api-flow-diagrams)
-14. [Part 14: Step-by-Step Backend Development Roadmap](#part-14--backend-development-order)
+14: [Part 14: Step-by-Step Backend Development Roadmap](#part-14--backend-development-order)
 15. [Part 15: Backend Environment Variables & Security](#part-15--environment-variables)
 16. [Part 16: Handover Summaries: What We Need From Each Other](#part-16--final-handover-summary)
 17. [Appendix: Executive Summary & Architectural Wrap-Up](#appendix--executive-summary)
@@ -29,31 +29,38 @@
 
 # PART 1 — FULL FRONTEND AUDIT
 
-The React frontend has been audited in full across all routes, stores, API clients, contexts, components, and unit tests. The frontend application is **100% completed, fully typed, and verified with zero build/lint errors**.
+The React frontend has been audited in full across all routes, stores, API clients, contexts, components, and unit tests. The frontend application is **100% completed, fully responsive, and operates in standalone mock mode without requiring an active backend**.
 
 ### 1.1 Complete Route Inventory (`src/App.jsx`)
 | Route | Component | Access Control | Purpose |
 |---|---|---|---|
-| `/` | `Home.jsx` | Public | Hero introduction, statutory overview, workflow steps, live metrics radar. |
+| `/` | `Home.jsx` | Public | Hero introduction, practical examples, community story submissions, live radar. |
 | `/intake` | `Intake.jsx` | Public | 3-step wizard: Plain language concern &rarr; AI RTI Request &rarr; Authority recommendation. |
 | `/directory` | `Directory.jsx` | Public | Searchable, filterable directory of public authorities (Central + Delhi NCT focus). |
 | `/login` | `Login.jsx` | Public | Citizen login via JWT credentials or instant single-click demo account. |
-| `/dashboard` | `Dashboard.jsx` | **Protected** | Operations cockpit with cards/list view, KPI metrics, statutory deadline radar. |
+| `/dashboard` | `Dashboard.jsx` | **Protected** | Operations cockpit with cards/list view, KPI metrics, statutory deadline progress bars, urgency filters. |
 | `/cases/new/filing` | `CaseFiling.jsx` | **Protected** | Portal link, mandatory instruction block, registration recording form. |
 | `/cases/:id` | `CaseDetail.jsx` | **Protected** | Full case tracking, 4-stage stepper, CPIO roster, queries, editable status, appeal trigger. |
 | `/appeals/:id` | `AppealDraftDetail.jsx` | **Protected** | First/Second appeal generator, editable textarea, copy-to-clipboard, disclaimer. |
+| `/about` | `About.jsx` | Public | Platform mission, core values, governance disclaimer, and citizen empowerment goals. |
+| `/contact` | `Contact.jsx` | Public | Citizen support channels, FAQs, feedback submission form, and helpline details. |
+| `/privacy` | `PrivacyPolicy.jsx` | Public | Privacy policy, zero-retention principles, personal data handling, and encryption. |
+| `/terms` | `TermsOfService.jsx` | Public | Terms of service, user obligations, independent legal-tech disclaimer. |
+| `/disclaimer` | `Disclaimer.jsx` | Public | Non-governmental legal disclaimer under Section 6(1) and citizen advisory. |
+| `/rti-act` | `RtiActGuide.jsx` | Public | Comprehensive citizen handbook: filing fees, timelines, exemptions, appeals. |
 | `*` | `Navigate to="/"` | Public | Catch-all redirect to `/`. |
 
 ### 1.2 Frontend Component & State Architecture
 - **State Store (`src/lib/store.js`):** Reactive store backed by `localStorage` (`rti_assist_cases`, `rti_assist_appeals`) providing seamless optimistic updates across navigation.
+- **Theme Context (`src/context/ThemeContext.jsx`):** Manages dynamic light/dark theme switching and clean design tokens.
 - **Auth Context (`src/context/AuthContext.jsx` & `.tsx`):** Manages `token`, `user`, `login()`, `logout()`, reading from `localStorage.getItem('rti_assist_token')` and `localStorage.getItem('rti_assist_user')`.
 - **Protected Route Guard (`src/components/ProtectedRoute.jsx`):** Evaluates `isAuthenticated`. If false, intercepts and redirects to `/login` preserving `state: { from: location }`.
 - **Deadline Formatting Engine (`src/lib/deadlineUtils.ts`):** 100% pure client utility computing urgency colors (`red < 3d`, `yellow < 7d`, `green >= 7d`), relative day counts, and labels from a backend-provided `dueDate`. Verified with 27 Vitest unit tests.
-- **Navigation (`src/components/Navbar.jsx`):** Global top navigation with route indicators, environment mode badge (`Mock Mode` vs `Live API`), user profile badge, and login/logout CTA.
+- **Navigation (`src/components/Navbar.jsx`):** Streamlined global top navigation with route indicators, user profile badge, and responsive mobile menu.
 
 ### 1.3 Environment Variables
 - `VITE_API_URL`: Points to the backend base URL (Default: `http://localhost:8000/api`).
-- `VITE_USE_MOCK`: Set to `true` to use client-side `mockApi.js`, or `false` to communicate with the Spring Boot backend.
+- `VITE_USE_MOCK`: Set to `true` to use client-side `mockApi.js` (currently enabled for standalone frontend operation), or `false` to communicate with the live backend.
 
 ### 1.4 How the Frontend Calls the Backend (`src/lib/api.ts` & `src/lib/api.js`)
 All HTTP requests go through a unified `request(endpoint, options)` client:
