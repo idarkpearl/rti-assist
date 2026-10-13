@@ -95,7 +95,7 @@ export const TermsOfService = () => {
             We reserve the right to modify these terms as legislation or platform capabilities change. For any inquiries regarding our terms of service, please contact:
           </p>
           <p className="font-bold text-[var(--foreground)]">
-            Legal & Compliance Desk — <a href="mailto:legal@rtiassist.org" className="text-[var(--primary)] underline">legal@rtiassist.org</a>
+            Legal & Compliance Desk — <a href="mailto:darkpearl251103@gmail.com" className="text-[var(--primary)] underline">darkpearl251103@gmail.com</a>
           </p>
         </section>
       </div>

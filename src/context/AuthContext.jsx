@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { AUTH_TOKEN_KEY, AUTH_USER_KEY } from '../lib/api.js';
+import { AUTH_TOKEN_KEY, AUTH_USER_KEY, api, isMockEnabled } from '../lib/api.js';
 
 const AuthContext = createContext(null);
 
@@ -52,44 +52,78 @@ export const AuthProvider = ({ children }) => {
   /**
    * Login function providing real or mock JWT authentication
    */
+  /**
+   * Login function using email and password
+   */
   const login = async (email, password) => {
     setLoading(true);
     try {
-      // Create mock JWT or call real backend if configured
-      const normalizedEmail = (email || 'citizen@rti-assist.org').trim();
-      const mockName = normalizedEmail.split('@')[0].replace(/[._-]/g, ' ');
-      const capitalizedName = mockName.charAt(0).toUpperCase() + mockName.slice(1);
+      const res = await api.post('/auth/login', { email, password });
+      if (res?.token && res?.user) {
+        localStorage.setItem(AUTH_TOKEN_KEY, res.token);
+        localStorage.setItem(AUTH_USER_KEY, JSON.stringify(res.user));
+        setToken(res.token);
+        setUser(res.user);
+        return { success: true, user: res.user, token: res.token };
+      }
+      throw new Error(res?.message || 'Authentication failed');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      // Generate a structured JWT-shaped token (Header.Payload.Signature)
-      const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
-      const payload = btoa(
-        JSON.stringify({
-          sub: 'usr-101',
-          email: normalizedEmail,
-          name: capitalizedName || 'RTI Applicant',
-          role: 'citizen',
-          iss: 'rti-assist-backend',
-          iat: Math.floor(Date.now() / 1000),
-          exp: Math.floor(Date.now() / 1000) + 86400 * 7, // 7 days
-        })
-      );
-      const signature = btoa('verified_rti_jwt_signature_key');
-      const generatedToken = `${header}.${payload}.${signature}`;
+  /**
+   * Send Brevo OTP code
+   */
+  const sendOtp = async (email, name) => {
+    setLoading(true);
+    try {
+      const res = await api.sendOtp(email, name);
+      return res;
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      const authenticatedUser = {
-        id: 'usr-101',
-        name: capitalizedName || 'RTI Applicant',
-        email: normalizedEmail,
-        role: 'citizen',
-      };
+  /**
+   * Verify Brevo OTP code and complete login/registration
+   */
+  const verifyOtp = async (email, otp, name) => {
+    setLoading(true);
+    try {
+      const res = await api.verifyOtp(email, otp, name);
+      if (res?.token && res?.user) {
+        localStorage.setItem(AUTH_TOKEN_KEY, res.token);
+        localStorage.setItem(AUTH_USER_KEY, JSON.stringify(res.user));
+        setToken(res.token);
+        setUser(res.user);
+        return {
+          success: true,
+          user: res.user,
+          token: res.token,
+          requiresPasswordSetup: Boolean(res.requiresPasswordSetup),
+        };
+      }
+      throw new Error(res?.message || 'Verification failed');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      setToken(generatedToken);
-      setUser(authenticatedUser);
-
-      return { success: true, user: authenticatedUser, token: generatedToken };
-    } catch (err) {
-      console.error('Authentication error', err);
-      throw err;
+  /**
+   * Set citizen account password
+   */
+  const setPassword = async (newPassword, emailFallback) => {
+    setLoading(true);
+    try {
+      const targetEmail = emailFallback || user?.email;
+      const res = await api.setPassword(newPassword, targetEmail);
+      if (res?.user) {
+        const mergedUser = { ...user, ...res.user, hasPassword: true };
+        setUser(mergedUser);
+        localStorage.setItem(AUTH_USER_KEY, JSON.stringify(mergedUser));
+      }
+      return res;
     } finally {
       setLoading(false);
     }
@@ -115,6 +149,9 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated: Boolean(token && user),
     login,
     logout,
+    sendOtp,
+    verifyOtp,
+    setPassword,
     loading,
   };
 

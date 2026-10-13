@@ -8,18 +8,26 @@ export function getStoredCases() {
   try {
     const raw = localStorage.getItem(CASES_STORAGE_KEY);
     if (!raw) {
-      localStorage.setItem(CASES_STORAGE_KEY, JSON.stringify(mockCases));
-      return mockCases;
+      return [];
     }
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    const fakeIds = ['case-101', 'case-102', 'case-103', 'case-104'];
+    const cleaned = parsed.filter(
+      (c) => !fakeIds.includes(c.id) && c.applicant?.email !== 'vikram.roy@example.com'
+    );
+    if (cleaned.length !== parsed.length) {
+      localStorage.setItem(CASES_STORAGE_KEY, JSON.stringify(cleaned));
+    }
+    return cleaned;
   } catch {
-    return mockCases;
+    return [];
   }
 }
 
 export function saveStoredCases(cases) {
   try {
-    localStorage.setItem(CASES_STORAGE_KEY, JSON.stringify(cases));
+    localStorage.setItem(CASES_STORAGE_KEY, JSON.stringify(cases || []));
   } catch (err) {
     console.error('Failed to persist cases to localStorage', err);
   }
@@ -29,18 +37,29 @@ export function getStoredAppeals() {
   try {
     const raw = localStorage.getItem(APPEALS_STORAGE_KEY);
     if (!raw) {
-      localStorage.setItem(APPEALS_STORAGE_KEY, JSON.stringify(mockAppealDrafts));
-      return mockAppealDrafts;
+      return [];
     }
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    const fakeIds = ['appeal-201', 'appeal-202'];
+    const cleaned = parsed.filter(
+      (a) =>
+        !fakeIds.includes(a.id) &&
+        !['case-101', 'case-102', 'case-103'].includes(a.caseId) &&
+        a.appellant?.email !== 'vikram.roy@example.com'
+    );
+    if (cleaned.length !== parsed.length) {
+      localStorage.setItem(APPEALS_STORAGE_KEY, JSON.stringify(cleaned));
+    }
+    return cleaned;
   } catch {
-    return mockAppealDrafts;
+    return [];
   }
 }
 
 export function saveStoredAppeals(appeals) {
   try {
-    localStorage.setItem(APPEALS_STORAGE_KEY, JSON.stringify(appeals));
+    localStorage.setItem(APPEALS_STORAGE_KEY, JSON.stringify(appeals || []));
   } catch (err) {
     console.error('Failed to persist appeals to localStorage', err);
   }

@@ -68,7 +68,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = async (email?: string, password?: string) => {
     setLoading(true);
     try {
-      const normalizedEmail = (email || 'citizen@rti-assist.org').trim();
+      const normalizedEmail = (email || 'darkpearl251103@gmail.com').trim();
       const mockName = normalizedEmail.split('@')[0].replace(/[._-]/g, ' ');
       const capitalizedName = mockName.charAt(0).toUpperCase() + mockName.slice(1);
 

@@ -32,12 +32,12 @@ function getUrgencyConfig(daysRemaining) {
       level: 'green',
       color: 'emerald',
       label: 'On Track',
-      badgeClass: 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
-      textClass: 'text-emerald-400',
-      dotClass: 'bg-emerald-400',
+      badgeClass: 'bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold',
+      textClass: 'text-emerald-700',
+      dotClass: 'bg-emerald-500',
       barClass: 'bg-emerald-500',
       bgGradient: 'from-emerald-500 to-teal-500',
-      borderClass: 'border-slate-800/80 hover:border-slate-700',
+      borderClass: 'border-slate-200 hover:border-slate-300',
     };
   }
 
@@ -46,12 +46,12 @@ function getUrgencyConfig(daysRemaining) {
       level: 'red',
       color: 'rose',
       label: daysRemaining <= 0 ? 'Overdue' : `${daysRemaining}d left (Action Due)`,
-      badgeClass: 'bg-rose-500/10 text-rose-400 border border-rose-500/25',
-      textClass: 'text-rose-400',
+      badgeClass: 'bg-rose-50 text-rose-700 border border-rose-200 font-semibold',
+      textClass: 'text-rose-700',
       dotClass: 'bg-rose-500',
       barClass: 'bg-rose-500',
       bgGradient: 'from-rose-500 to-red-600',
-      borderClass: 'border-rose-500/40 hover:border-rose-500/60',
+      borderClass: 'border-rose-200 hover:border-rose-300',
     };
   }
 
@@ -60,12 +60,12 @@ function getUrgencyConfig(daysRemaining) {
       level: 'yellow',
       color: 'amber',
       label: `${daysRemaining}d left (Upcoming)`,
-      badgeClass: 'bg-amber-500/10 text-amber-400 border border-amber-500/25',
-      textClass: 'text-amber-400',
-      dotClass: 'bg-amber-400',
+      badgeClass: 'bg-amber-50 text-amber-800 border border-amber-200 font-semibold',
+      textClass: 'text-amber-800',
+      dotClass: 'bg-amber-500',
       barClass: 'bg-amber-500',
       bgGradient: 'from-amber-500 to-amber-600',
-      borderClass: 'border-amber-500/40 hover:border-amber-500/60',
+      borderClass: 'border-amber-200 hover:border-amber-300',
     };
   }
 
@@ -73,12 +73,12 @@ function getUrgencyConfig(daysRemaining) {
     level: 'green',
     color: 'emerald',
     label: `${daysRemaining}d left (On Track)`,
-    badgeClass: 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
-    textClass: 'text-emerald-400',
-    dotClass: 'bg-emerald-400',
+    badgeClass: 'bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold',
+    textClass: 'text-emerald-700',
+    dotClass: 'bg-emerald-500',
     barClass: 'bg-emerald-500',
     bgGradient: 'from-emerald-500 to-teal-500',
-    borderClass: 'border-slate-800/80 hover:border-slate-700',
+    borderClass: 'border-slate-200 hover:border-slate-300',
   };
 }
 
@@ -88,39 +88,39 @@ function getStageInfo(caseItem) {
     return {
       stage: 'Second Appeal',
       sublabel: 'CIC / SIC Commission',
-      badgeClass: 'bg-purple-500/10 text-purple-400 border border-purple-500/20',
-      dotClass: 'bg-purple-400',
+      badgeClass: 'bg-purple-50 text-purple-700 border border-purple-200 font-semibold',
+      dotClass: 'bg-purple-500',
     };
   }
   if (caseItem.status === 'first_appeal_pending' || (caseItem.appeals && caseItem.appeals.length > 0)) {
     return {
       stage: 'First Appeal',
       sublabel: 'Sec 19(1) First Appellate Body',
-      badgeClass: 'bg-amber-500/10 text-amber-400 border border-amber-500/20',
-      dotClass: 'bg-amber-400',
+      badgeClass: 'bg-amber-50 text-amber-800 border border-amber-200 font-semibold',
+      dotClass: 'bg-amber-500',
     };
   }
   if (caseItem.status === 'pio_replied') {
     return {
       stage: 'Response Due',
       sublabel: 'PIO Replied (Under Review)',
-      badgeClass: 'bg-teal-500/10 text-teal-400 border border-teal-500/20',
-      dotClass: 'bg-teal-400',
+      badgeClass: 'bg-teal-50 text-teal-700 border border-teal-200 font-semibold',
+      dotClass: 'bg-teal-500',
     };
   }
   if (caseItem.status === 'response_due' || (caseItem.deadlines && caseItem.deadlines[0]?.daysRemaining < 30)) {
     return {
       stage: 'Response Due',
       sublabel: '30-Day PIO Window (Sec 7(1))',
-      badgeClass: 'bg-blue-500/10 text-blue-400 border border-blue-500/20',
-      dotClass: 'bg-blue-400',
+      badgeClass: 'bg-blue-50 text-blue-700 border border-blue-200 font-semibold',
+      dotClass: 'bg-blue-500',
     };
   }
   return {
     stage: 'Filed',
     sublabel: 'Sec 6(1) Submitted',
-    badgeClass: 'bg-sky-500/10 text-sky-400 border border-sky-500/20',
-    dotClass: 'bg-sky-400',
+    badgeClass: 'bg-sky-50 text-sky-700 border border-sky-200 font-semibold',
+    dotClass: 'bg-sky-500',
   };
 }
 
@@ -249,23 +249,23 @@ export const Dashboard = () => {
   const isFilteringActive = searchTerm || statusFilter !== 'all' || urgencyFilter !== 'all';
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-6 pb-20 font-sans">
       {/* 1. Header Row */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
         <div>
           <div className="flex items-center gap-2 mb-1.5">
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
             </span>
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
               Live Compliance Monitor
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
             Case Tracking & Deadlines
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-2xl">
+          <p className="text-sm text-slate-600 font-medium mt-1 max-w-2xl">
             Monitor public authority response timelines, track 30-day statutory windows, and manage appeals.
           </p>
         </div>
@@ -274,7 +274,7 @@ export const Dashboard = () => {
           <button
             onClick={fetchCases}
             disabled={loading}
-            className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-500/30 transition shadow-sm disabled:opacity-50"
+            className="p-2.5 rounded-xl border-2 border-slate-200 bg-white text-slate-700 hover:text-blue-600 hover:border-blue-300 transition shadow-sm disabled:opacity-50 cursor-pointer"
             title="Refresh Cases"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -282,7 +282,7 @@ export const Dashboard = () => {
 
           <Link
             to="/intake"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-500 shadow-md shadow-blue-500/20 active:scale-95 transition-all"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-sm active:scale-95 transition-all cursor-pointer"
           >
             <PlusCircle className="w-4 h-4" />
             <span>New RTI Request</span>
@@ -295,19 +295,19 @@ export const Dashboard = () => {
         {/* Card 1: Total Filings */}
         <div
           onClick={() => { setUrgencyFilter('all'); setStatusFilter('all'); }}
-          className="cursor-pointer p-5 rounded-2xl bg-white dark:bg-[#121826] border border-slate-200/80 dark:border-slate-800/80 hover:border-slate-300 dark:hover:border-slate-700 transition-all shadow-sm hover:shadow-md group relative overflow-hidden"
+          className="cursor-pointer p-5 rounded-2xl bg-white border-2 border-slate-200 hover:border-slate-300 transition-all shadow-sm hover:shadow-md group relative overflow-hidden"
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+            <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">
               Total Applications
             </span>
-            <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center">
               <FileText className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-3xl font-bold text-slate-900 dark:text-white mt-3">{totalCases}</div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 inline-block"></span>
+          <div className="text-3xl font-black text-slate-900 mt-3">{totalCases}</div>
+          <p className="text-xs text-slate-500 font-medium mt-1 flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-blue-500 inline-block"></span>
             <span>All submitted RTI cases</span>
           </p>
         </div>
@@ -315,23 +315,23 @@ export const Dashboard = () => {
         {/* Card 2: Critical Urgency */}
         <div
           onClick={() => setUrgencyFilter(urgencyFilter === 'red' ? 'all' : 'red')}
-          className={`cursor-pointer p-5 rounded-2xl bg-white dark:bg-[#121826] border transition-all shadow-sm hover:shadow-md group relative overflow-hidden ${
+          className={`cursor-pointer p-5 rounded-2xl bg-white border-2 transition-all shadow-sm hover:shadow-md group relative overflow-hidden ${
             urgencyFilter === 'red'
-              ? 'border-rose-500/80 ring-2 ring-rose-500/20 bg-rose-50/50 dark:bg-rose-950/20'
-              : 'border-slate-200/80 dark:border-slate-800/80 hover:border-rose-400/50'
+              ? 'border-rose-400 ring-2 ring-rose-200 bg-rose-50/40'
+              : 'border-slate-200 hover:border-rose-300'
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-rose-600 dark:text-rose-400 uppercase tracking-wider">
+            <span className="text-xs font-bold text-rose-700 uppercase tracking-wider">
               Action Due (&lt; 3 Days)
             </span>
-            <div className="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 border border-rose-100 flex items-center justify-center">
               <AlertTriangle className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-3xl font-bold text-rose-600 dark:text-rose-400 mt-3">{redUrgentCount}</div>
-          <p className="text-xs text-rose-600/80 dark:text-rose-400/80 mt-1 flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-rose-500 inline-block"></span>
+          <div className="text-3xl font-black text-rose-600 mt-3">{redUrgentCount}</div>
+          <p className="text-xs text-rose-700/80 font-medium mt-1 flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-rose-500 inline-block"></span>
             <span>Immediate response or appeal</span>
           </p>
         </div>
@@ -339,23 +339,23 @@ export const Dashboard = () => {
         {/* Card 3: Impending Reply */}
         <div
           onClick={() => setUrgencyFilter(urgencyFilter === 'yellow' ? 'all' : 'yellow')}
-          className={`cursor-pointer p-5 rounded-2xl bg-white dark:bg-[#121826] border transition-all shadow-sm hover:shadow-md group relative overflow-hidden ${
+          className={`cursor-pointer p-5 rounded-2xl bg-white border-2 transition-all shadow-sm hover:shadow-md group relative overflow-hidden ${
             urgencyFilter === 'yellow'
-              ? 'border-amber-500/80 ring-2 ring-amber-500/20 bg-amber-50/50 dark:bg-amber-950/20'
-              : 'border-slate-200/80 dark:border-slate-800/80 hover:border-amber-400/50'
+              ? 'border-amber-400 ring-2 ring-amber-200 bg-amber-50/40'
+              : 'border-slate-200 hover:border-amber-300'
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
+            <span className="text-xs font-bold text-amber-800 uppercase tracking-wider">
               Upcoming (&lt; 7 Days)
             </span>
-            <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center">
               <Clock className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-3xl font-bold text-amber-600 dark:text-amber-400 mt-3">{yellowUrgentCount}</div>
-          <p className="text-xs text-amber-600/80 dark:text-amber-400/80 mt-1 flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 inline-block"></span>
+          <div className="text-3xl font-black text-amber-600 mt-3">{yellowUrgentCount}</div>
+          <p className="text-xs text-amber-800/80 font-medium mt-1 flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-amber-500 inline-block"></span>
             <span>Approaching statutory reply</span>
           </p>
         </div>
@@ -363,23 +363,23 @@ export const Dashboard = () => {
         {/* Card 4: Active Appeals */}
         <div
           onClick={() => setStatusFilter(statusFilter === 'first_appeal' ? 'all' : 'first_appeal')}
-          className={`cursor-pointer p-5 rounded-2xl bg-white dark:bg-[#121826] border transition-all shadow-sm hover:shadow-md group relative overflow-hidden ${
+          className={`cursor-pointer p-5 rounded-2xl bg-white border-2 transition-all shadow-sm hover:shadow-md group relative overflow-hidden ${
             statusFilter === 'first_appeal'
-              ? 'border-purple-500/80 ring-2 ring-purple-500/20 bg-purple-50/50 dark:bg-purple-950/20'
-              : 'border-slate-200/80 dark:border-slate-800/80 hover:border-purple-400/50'
+              ? 'border-purple-400 ring-2 ring-purple-200 bg-purple-50/40'
+              : 'border-slate-200 hover:border-purple-300'
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-wider">
+            <span className="text-xs font-bold text-purple-700 uppercase tracking-wider">
               Appeals Active
             </span>
-            <div className="w-8 h-8 rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 border border-purple-100 flex items-center justify-center">
               <Scale className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-3xl font-bold text-purple-600 dark:text-purple-400 mt-3">{pendingAppeals}</div>
-          <p className="text-xs text-purple-600/80 dark:text-purple-400/80 mt-1 flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-purple-500 inline-block"></span>
+          <div className="text-3xl font-black text-purple-600 mt-3">{pendingAppeals}</div>
+          <p className="text-xs text-purple-700/80 font-medium mt-1 flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-purple-500 inline-block"></span>
             <span>Sec 19 First/Second Appeals</span>
           </p>
         </div>
@@ -396,12 +396,12 @@ export const Dashboard = () => {
               placeholder="Search by tracking ID, department, or keyword..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-9 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#121826] text-xs font-medium text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition shadow-sm"
+              className="w-full pl-10 pr-9 py-2.5 rounded-xl border-2 border-slate-200 bg-white text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 shadow-sm transition"
             />
             {searchTerm && (
               <button
                 onClick={() => setSearchTerm('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -411,23 +411,23 @@ export const Dashboard = () => {
           {/* Urgency Quick Chips & View Switcher */}
           <div className="flex items-center gap-2 self-start md:self-auto overflow-x-auto w-full md:w-auto">
             {/* Urgency Filter Chips */}
-            <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-900/80 p-1 rounded-xl border border-slate-200 dark:border-slate-800/80 text-xs">
+            <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs">
               <button
                 onClick={() => setUrgencyFilter('all')}
-                className={`px-3 py-1.5 rounded-lg font-medium transition ${
+                className={`px-3 py-1.5 rounded-lg font-bold transition cursor-pointer ${
                   urgencyFilter === 'all'
-                    ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    ? 'bg-white text-slate-900 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 All Urgency
               </button>
               <button
                 onClick={() => setUrgencyFilter(urgencyFilter === 'red' ? 'all' : 'red')}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition ${
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold transition cursor-pointer ${
                   urgencyFilter === 'red'
                     ? 'bg-rose-500 text-white shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-rose-500 dark:hover:text-rose-400'
+                    : 'text-slate-600 hover:text-rose-600'
                 }`}
               >
                 <span className={`w-1.5 h-1.5 rounded-full ${urgencyFilter === 'red' ? 'bg-white' : 'bg-rose-500'}`}></span>
@@ -435,10 +435,10 @@ export const Dashboard = () => {
               </button>
               <button
                 onClick={() => setUrgencyFilter(urgencyFilter === 'yellow' ? 'all' : 'yellow')}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition ${
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold transition cursor-pointer ${
                   urgencyFilter === 'yellow'
-                    ? 'bg-amber-500 text-slate-950 font-semibold shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-amber-500 dark:hover:text-amber-400'
+                    ? 'bg-amber-500 text-slate-950 shadow-sm'
+                    : 'text-slate-600 hover:text-amber-600'
                 }`}
               >
                 <span className={`w-1.5 h-1.5 rounded-full ${urgencyFilter === 'yellow' ? 'bg-slate-950' : 'bg-amber-500'}`}></span>
@@ -446,10 +446,10 @@ export const Dashboard = () => {
               </button>
               <button
                 onClick={() => setUrgencyFilter(urgencyFilter === 'green' ? 'all' : 'green')}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition ${
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold transition cursor-pointer ${
                   urgencyFilter === 'green'
-                    ? 'bg-emerald-500 text-white shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-emerald-500 dark:hover:text-emerald-400'
+                    ? 'bg-emerald-600 text-white shadow-sm'
+                    : 'text-slate-600 hover:text-emerald-600'
                 }`}
               >
                 <span className={`w-1.5 h-1.5 rounded-full ${urgencyFilter === 'green' ? 'bg-white' : 'bg-emerald-500'}`}></span>
@@ -458,13 +458,13 @@ export const Dashboard = () => {
             </div>
 
             {/* View Mode Switcher */}
-            <div className="flex items-center bg-slate-100 dark:bg-slate-900/80 p-1 rounded-xl border border-slate-200 dark:border-slate-800/80 text-xs shrink-0">
+            <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs shrink-0">
               <button
                 onClick={() => setViewMode('card')}
-                className={`p-1.5 rounded-lg flex items-center gap-1 transition ${
+                className={`p-1.5 rounded-lg flex items-center gap-1 transition cursor-pointer ${
                   viewMode === 'card'
-                    ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm font-semibold'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    ? 'bg-white text-slate-900 shadow-sm font-bold'
+                    : 'text-slate-500 hover:text-slate-900'
                 }`}
                 title="Grid View"
               >
@@ -472,10 +472,10 @@ export const Dashboard = () => {
               </button>
               <button
                 onClick={() => setViewMode('list')}
-                className={`p-1.5 rounded-lg flex items-center gap-1 transition ${
+                className={`p-1.5 rounded-lg flex items-center gap-1 transition cursor-pointer ${
                   viewMode === 'list'
-                    ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm font-semibold'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    ? 'bg-white text-slate-900 shadow-sm font-bold'
+                    : 'text-slate-500 hover:text-slate-900'
                 }`}
                 title="Table View"
               >
@@ -486,7 +486,7 @@ export const Dashboard = () => {
         </div>
 
         {/* Stage Segmented Bar */}
-        <div className="flex items-center justify-between gap-3 pt-1 border-b border-slate-200/80 dark:border-slate-800/80 pb-3">
+        <div className="flex items-center justify-between gap-3 pt-1 border-b border-slate-200 pb-3">
           <div className="flex items-center gap-2 overflow-x-auto text-xs py-0.5">
             {[
               { key: 'all', label: 'All Cases', count: totalCases },
@@ -498,17 +498,17 @@ export const Dashboard = () => {
               <button
                 key={tab.key}
                 onClick={() => setStatusFilter(tab.key)}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium whitespace-nowrap transition ${
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold whitespace-nowrap transition cursor-pointer ${
                   statusFilter === tab.key
-                    ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-semibold border border-blue-500/20'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-900/60'
+                    ? 'bg-blue-50 text-blue-700 border-2 border-blue-200 shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                 }`}
               >
                 <span>{tab.label}</span>
-                <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
                   statusFilter === tab.key
-                    ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400 font-bold'
-                    : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-slate-200 text-slate-700'
                 }`}>
                   {tab.count}
                 </span>
@@ -523,7 +523,7 @@ export const Dashboard = () => {
                 setStatusFilter('all');
                 setUrgencyFilter('all');
               }}
-              className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline shrink-0"
+              className="text-xs font-bold text-blue-600 hover:underline shrink-0 cursor-pointer"
             >
               Reset Filters
             </button>
@@ -532,11 +532,30 @@ export const Dashboard = () => {
       </div>
 
       {/* 4. Main Case Content */}
-      {filteredCases.length === 0 ? (
-        <div className="p-16 text-center rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#121826] space-y-3 shadow-sm">
+      {cases.length === 0 ? (
+        <div className="p-16 text-center rounded-2xl border-2 border-slate-200 bg-white space-y-4 shadow-sm">
+          <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 border border-blue-100 mx-auto flex items-center justify-center">
+            <FileText className="w-7 h-7" />
+          </div>
+          <div className="space-y-1">
+            <h3 className="text-base font-black text-slate-900">No RTI Cases Filed Yet</h3>
+            <p className="text-xs text-slate-500 font-medium max-w-md mx-auto leading-relaxed">
+              You currently have no active or archived RTI applications. Use our AI draft generator to draft and track your first RTI application under Section 6(1).
+            </p>
+          </div>
+          <Link
+            to="/intake"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold bg-blue-600 text-white hover:bg-blue-700 transition shadow-sm cursor-pointer"
+          >
+            <PlusCircle className="w-4 h-4" />
+            <span>File Your First RTI Application</span>
+          </Link>
+        </div>
+      ) : filteredCases.length === 0 ? (
+        <div className="p-16 text-center rounded-2xl border-2 border-slate-200 bg-white space-y-3 shadow-sm">
           <FileText className="w-10 h-10 text-slate-400 mx-auto" />
-          <h3 className="text-base font-semibold text-slate-900 dark:text-white">No RTI cases match your filters</h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
+          <h3 className="text-base font-black text-slate-900">No RTI cases match your filters</h3>
+          <p className="text-xs text-slate-500 font-medium max-w-sm mx-auto">
             Try adjusting your search query, stage selection, or urgency filter.
           </p>
           <button
@@ -545,7 +564,7 @@ export const Dashboard = () => {
               setStatusFilter('all');
               setUrgencyFilter('all');
             }}
-            className="px-4 py-2 rounded-xl text-xs font-semibold bg-blue-600 text-white hover:bg-blue-500 transition shadow-sm"
+            className="px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 text-white hover:bg-blue-700 transition shadow-sm cursor-pointer"
           >
             Clear All Filters
           </button>
@@ -572,7 +591,7 @@ export const Dashboard = () => {
             return (
               <div
                 key={c.id}
-                className="flex flex-col justify-between rounded-2xl bg-white dark:bg-[#121826] border border-slate-200/90 dark:border-slate-800/90 hover:border-slate-300 dark:hover:border-slate-700/80 shadow-sm hover:shadow-xl hover:shadow-blue-950/10 hover:-translate-y-0.5 transition-all duration-200 group overflow-hidden"
+                className="flex flex-col justify-between rounded-2xl bg-white border-2 border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md transition-all duration-200 group overflow-hidden"
               >
                 {/* Top Subtle Urgency Gradient Bar */}
                 <div className={`h-1.5 w-full bg-gradient-to-r ${urgency.bgGradient}`} />
@@ -581,15 +600,15 @@ export const Dashboard = () => {
                   <div className="space-y-3.5">
                     {/* Top Row: Mono Tracking Number & Stage */}
                     <div className="flex items-center justify-between gap-2">
-                      <span className="font-mono text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700/60 px-2.5 py-1 rounded-lg flex items-center gap-1.5">
+                      <span className="font-mono text-xs font-bold text-slate-800 bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-lg flex items-center gap-1.5">
                         <span>{c.trackingNumber}</span>
                         <button
                           onClick={(e) => handleCopy(c.trackingNumber, e)}
-                          className="text-slate-400 hover:text-blue-500 transition"
+                          className="text-slate-400 hover:text-blue-600 transition cursor-pointer"
                           title="Copy tracking number"
                         >
                           {copiedId === c.trackingNumber ? (
-                            <Check className="w-3 h-3 text-emerald-500" />
+                            <Check className="w-3 h-3 text-emerald-600" />
                           ) : (
                             <Copy className="w-3 h-3" />
                           )}
@@ -598,56 +617,76 @@ export const Dashboard = () => {
 
                       <div className="flex items-center gap-1.5">
                         {c.isLifeAndLiberty && (
-                          <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-500 border border-rose-500/20">
+                          <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200">
                             48h Priority
                           </span>
                         )}
-                        <span className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${stageInfo.badgeClass}`}>
+                        <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${stageInfo.badgeClass}`}>
                           {stageInfo.stage}
                         </span>
                       </div>
                     </div>
 
                     {/* Case Title */}
-                    <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2 leading-snug">
+                    <h2 className="text-base font-bold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2 leading-snug">
                       <Link to={`/cases/${c.id}`}>{c.title}</Link>
                     </h2>
 
+                    {/* Last Response Classification Indicator (if present) */}
+                    {(c.responseClassification?.status || c.lastResponseStatus) && (
+                      <div className="pt-0.5">
+                        <Link
+                          to={`/cases/${c.id}/response`}
+                          className={`inline-flex items-center gap-1.5 text-[11px] font-bold uppercase px-2.5 py-0.5 rounded-full border transition hover:opacity-85 ${
+                            (c.responseClassification?.status || c.lastResponseStatus) === 'DENIED' ||
+                            (c.responseClassification?.status || c.lastResponseStatus) === 'EVASIVE_VAGUE'
+                              ? 'bg-rose-50 text-rose-700 border-rose-200'
+                              : (c.responseClassification?.status || c.lastResponseStatus) === 'FULLY_ANSWERED'
+                              ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                              : 'bg-amber-50 text-amber-800 border-amber-200'
+                          }`}
+                        >
+                          <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                          <span>Last response: {(c.responseClassification?.status || c.lastResponseStatus).replace(/_/g, ' ')}</span>
+                        </Link>
+                      </div>
+                    )}
+
                     {/* Authority Information */}
-                    <div className="flex items-start gap-2.5 text-xs text-slate-600 dark:text-slate-300 pt-1">
-                      <div className="w-6 h-6 rounded-md bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 mt-0.5 border border-blue-200/50 dark:border-blue-900/40">
+                    <div className="flex items-start gap-2.5 text-xs text-slate-700 pt-1">
+                      <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center shrink-0 mt-0.5">
                         <Building2 className="w-3.5 h-3.5" />
                       </div>
                       <div className="min-w-0">
-                        <p className="font-semibold text-slate-900 dark:text-slate-200 truncate">
+                        <p className="font-bold text-slate-900 truncate">
                           {c.authority?.name || 'Public Authority'}
                         </p>
                         {c.authority?.ministry && (
-                          <p className="text-[11px] text-slate-400 truncate">{c.authority.ministry}</p>
+                          <p className="text-[11px] text-slate-500 truncate font-medium">{c.authority.ministry}</p>
                         )}
                       </div>
                     </div>
 
-                    {/* Sleek Statutory Progress Bar (Eliminates Box Clutter) */}
-                    <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800/80 space-y-2 mt-2">
+                    {/* Sleek Statutory Progress Bar */}
+                    <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2 mt-2">
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-slate-500 dark:text-slate-400 font-medium truncate">
+                        <span className="text-slate-600 font-semibold truncate">
                           {deadline.title}
                         </span>
-                        <span className={`font-semibold text-[11px] px-2 py-0.5 rounded-full ${urgency.badgeClass}`}>
+                        <span className={`font-bold text-[11px] px-2 py-0.5 rounded-full ${urgency.badgeClass}`}>
                           {urgency.label}
                         </span>
                       </div>
 
                       {/* Slim Visual Progress Track */}
-                      <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                      <div className="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
                         <div
                           className={`h-full rounded-full transition-all duration-500 ${urgency.barClass}`}
                           style={{ width: `${progressPercent}%` }}
                         />
                       </div>
 
-                      <div className="flex items-center justify-between text-[11px] text-slate-400 pt-0.5">
+                      <div className="flex items-center justify-between text-[11px] text-slate-500 font-medium pt-0.5">
                         <span className="flex items-center gap-1">
                           <Calendar className="w-3 h-3" />
                           <span>Filed: {filingDateFormatted}</span>
@@ -658,17 +697,17 @@ export const Dashboard = () => {
                   </div>
 
                   {/* Footer Action */}
-                  <div className="pt-3.5 mt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
-                    <span className="inline-flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
-                      <span className={`w-2 h-2 rounded-full ${c.status === 'pio_replied' ? 'bg-amber-400' : 'bg-emerald-400'}`} />
+                  <div className="pt-3.5 mt-2 border-t border-slate-100 flex items-center justify-between">
+                    <span className="inline-flex items-center gap-1.5 text-xs text-slate-600 font-medium">
+                      <span className={`w-2 h-2 rounded-full ${c.status === 'pio_replied' ? 'bg-amber-500' : 'bg-emerald-500'}`} />
                       <span className="capitalize">{c.status?.replace(/_/g, ' ')}</span>
-                      <span className="text-slate-300 dark:text-slate-600">•</span>
+                      <span className="text-slate-300">•</span>
                       <span>{c.queries?.length || 1} {c.queries?.length === 1 ? 'Query' : 'Queries'}</span>
                     </span>
 
                     <Link
                       to={`/cases/${c.id}`}
-                      className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 group/btn transition"
+                      className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-700 group/btn transition"
                     >
                       <span>View Details</span>
                       <ArrowUpRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
@@ -681,21 +720,21 @@ export const Dashboard = () => {
         </div>
       ) : (
         /* ================= SLEEK TABLE VIEW ================= */
-        <div className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#121826] rounded-2xl overflow-hidden shadow-sm">
+        <div className="border-2 border-slate-200 bg-white rounded-2xl overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="bg-slate-50 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[11px] font-semibold">
-                  <th className="py-3 px-4">Tracking ID & Title</th>
-                  <th className="py-3 px-4">Authority</th>
-                  <th className="py-3 px-4">Filed Date</th>
-                  <th className="py-3 px-4">Current Stage</th>
-                  <th className="py-3 px-4">Next Deadline</th>
-                  <th className="py-3 px-4 text-center">Urgency</th>
-                  <th className="py-3 px-4 text-right">Action</th>
+                <tr className="bg-slate-50 border-b-2 border-slate-200 text-slate-600 uppercase tracking-wider text-[11px] font-bold">
+                  <th className="py-3.5 px-4">Tracking ID & Title</th>
+                  <th className="py-3.5 px-4">Authority</th>
+                  <th className="py-3.5 px-4">Filed Date</th>
+                  <th className="py-3.5 px-4">Current Stage</th>
+                  <th className="py-3.5 px-4">Next Deadline</th>
+                  <th className="py-3.5 px-4 text-center">Urgency</th>
+                  <th className="py-3.5 px-4 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
+              <tbody className="divide-y divide-slate-100">
                 {filteredCases.map((c) => {
                   const stageInfo = getStageInfo(c);
                   const deadline = getDeadlineInfo(c);
@@ -709,41 +748,56 @@ export const Dashboard = () => {
                   return (
                     <tr
                       key={c.id}
-                      className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition group"
+                      className="hover:bg-slate-50/80 transition group"
                     >
                       {/* Tracking ID & Title */}
                       <td className="py-3.5 px-4 min-w-[220px]">
                         <div className="space-y-1">
-                          <span className="font-mono text-[11px] font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700 inline-block">
+                          <span className="font-mono text-[11px] font-bold text-slate-800 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 inline-block">
                             {c.trackingNumber}
                           </span>
                           <Link
                             to={`/cases/${c.id}`}
-                            className="block text-sm font-semibold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition truncate max-w-xs"
+                            className="block text-sm font-bold text-slate-900 group-hover:text-blue-600 transition truncate max-w-xs"
                           >
                             {c.title}
                           </Link>
+                          {(c.responseClassification?.status || c.lastResponseStatus) && (
+                            <Link
+                              to={`/cases/${c.id}/response`}
+                              className={`inline-block text-[10px] font-bold uppercase px-2 py-0.2 rounded-full border transition hover:opacity-85 ${
+                                (c.responseClassification?.status || c.lastResponseStatus) === 'DENIED' ||
+                                (c.responseClassification?.status || c.lastResponseStatus) === 'EVASIVE_VAGUE'
+                                  ? 'bg-rose-50 text-rose-700 border-rose-200'
+                                  : (c.responseClassification?.status || c.lastResponseStatus) === 'FULLY_ANSWERED'
+                                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                  : 'bg-amber-50 text-amber-800 border-amber-200'
+                              }`}
+                            >
+                              Last: {(c.responseClassification?.status || c.lastResponseStatus).replace(/_/g, ' ')}
+                            </Link>
+                          )}
                         </div>
                       </td>
 
                       {/* Authority */}
                       <td className="py-3.5 px-4 min-w-[200px]">
                         <div className="space-y-0.5">
-                          <p className="font-semibold text-slate-900 dark:text-slate-200">{c.authority?.name || 'Public Authority'}</p>
+                          <p className="font-bold text-slate-900">{c.authority?.name || 'Public Authority'}</p>
                           {c.authority?.ministry && (
-                            <p className="text-[11px] text-slate-400">{c.authority.ministry}</p>
+                            <p className="text-[11px] text-slate-500 font-medium">{c.authority.ministry}</p>
                           )}
                         </div>
                       </td>
 
                       {/* Filed Date */}
-                      <td className="py-3.5 px-4 whitespace-nowrap text-slate-600 dark:text-slate-300 font-medium">
+                      <td className="py-3.5 px-4 whitespace-nowrap text-slate-600 font-medium">
                         {filingDateFormatted}
                       </td>
 
                       {/* Current Stage */}
                       <td className="py-3.5 px-4 whitespace-nowrap">
-                        <span className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${stageInfo.badgeClass}`}>
+                        <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${stageInfo.badgeClass}`}>
                           {stageInfo.stage}
                         </span>
                       </td>
@@ -751,8 +805,8 @@ export const Dashboard = () => {
                       {/* Next Deadline */}
                       <td className="py-3.5 px-4 min-w-[180px]">
                         <div>
-                          <p className="font-semibold text-slate-800 dark:text-slate-200 truncate">{deadline.title}</p>
-                          <p className="text-[11px] text-slate-400">
+                          <p className="font-bold text-slate-900 truncate">{deadline.title}</p>
+                          <p className="text-[11px] text-slate-500 font-medium">
                             Due: {new Date(deadline.dueDate).toLocaleDateString()}
                           </p>
                         </div>
@@ -760,7 +814,7 @@ export const Dashboard = () => {
 
                       {/* Urgency */}
                       <td className="py-3.5 px-4 whitespace-nowrap text-center">
-                        <div className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${urgency.badgeClass}`}>
+                        <div className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold ${urgency.badgeClass}`}>
                           <span className={`w-1.5 h-1.5 rounded-full ${urgency.dotClass}`} />
                           <span>{deadline.daysRemaining <= 0 ? 'Overdue' : `${deadline.daysRemaining}d`}</span>
                         </div>
@@ -770,7 +824,7 @@ export const Dashboard = () => {
                       <td className="py-3.5 px-4 whitespace-nowrap text-right">
                         <Link
                           to={`/cases/${c.id}`}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-white bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-600 transition"
+                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold text-blue-600 hover:text-white bg-blue-50 hover:bg-blue-600 transition"
                         >
                           <span>Open</span>
                           <ChevronRight className="w-3.5 h-3.5" />

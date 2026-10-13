@@ -25,6 +25,7 @@ import {
   ChevronRight,
   AlertCircle,
   HelpCircle,
+  Scale,
 } from 'lucide-react';
 import { api } from '../lib/api.js';
 import { useCaseStore } from '../lib/store.js';
@@ -127,8 +128,8 @@ export const CaseDetail = () => {
   if (loading) {
     return (
       <div className="py-24 text-center space-y-4">
-        <Loader2 className="w-8 h-8 text-cyan-400 animate-spin mx-auto" />
-        <p className="text-sm text-slate-400">Loading RTI case particulars from repository...</p>
+        <Loader2 className="w-8 h-8 text-blue-600 animate-spin mx-auto" />
+        <p className="text-sm text-slate-500 font-medium">Loading RTI case particulars from repository...</p>
       </div>
     );
   }
@@ -137,16 +138,16 @@ export const CaseDetail = () => {
   if (!caseItem || error) {
     return (
       <div className="py-16 text-center space-y-4 max-w-md mx-auto">
-        <div className="w-12 h-12 rounded-2xl bg-rose-950/80 text-rose-400 border border-rose-800/80 flex items-center justify-center mx-auto">
+        <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 border-2 border-rose-200 flex items-center justify-center mx-auto shadow-xs">
           <AlertCircle className="w-6 h-6" />
         </div>
-        <h2 className="text-xl font-bold text-white">Case Not Found</h2>
-        <p className="text-sm text-slate-400">
-          The requested RTI case id <span className="font-mono text-cyan-300">"{id}"</span> does not exist or has been removed.
+        <h2 className="text-xl font-bold text-slate-900">Case Not Found</h2>
+        <p className="text-sm text-slate-500">
+          The requested RTI case id <span className="font-mono text-slate-900 font-bold">"{id}"</span> does not exist or has been removed.
         </p>
         <Link
           to="/dashboard"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-cyan-400 rounded-xl text-sm font-semibold transition"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold transition shadow-sm"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Dashboard</span>
@@ -287,51 +288,68 @@ export const CaseDetail = () => {
       <div>
         <Link
           to="/dashboard"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-cyan-400 mb-3 transition"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 mb-3 transition"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back to Dashboard</span>
         </Link>
 
         {/* Top Header Card */}
-        <div className="p-6 sm:p-7 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-xl space-y-4">
+        <div className="p-6 sm:p-7 rounded-2xl bg-white border-2 border-slate-200 shadow-sm space-y-4">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div className="space-y-2">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="font-mono text-xs font-bold text-cyan-400 bg-cyan-950/80 px-2.5 py-1 rounded-md border border-cyan-800/60">
+                <span className="font-mono text-xs font-bold text-blue-900 bg-blue-50 px-3 py-1 rounded-md border-2 border-blue-200">
                   {caseItem.trackingNumber}
                 </span>
 
                 {caseItem.isLifeAndLiberty && (
-                  <span className="text-[11px] font-bold uppercase px-2.5 py-1 rounded-full bg-rose-950 text-rose-300 border border-rose-800/80 flex items-center gap-1">
-                    <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
+                  <span className="text-[11px] font-bold uppercase px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 border-2 border-rose-200 flex items-center gap-1">
+                    <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
                     <span>48h Life & Liberty (Sec 7(1) Proviso)</span>
                   </span>
                 )}
 
+                {(caseItem.responseClassification?.status || caseItem.lastResponseStatus) && (
+                  <Link
+                    to={`/cases/${caseItem.id}/response`}
+                    className={`text-[11px] font-bold uppercase px-3 py-1 rounded-full border-2 flex items-center gap-1.5 transition hover:opacity-90 ${
+                      (caseItem.responseClassification?.status || caseItem.lastResponseStatus) === 'DENIED' ||
+                      (caseItem.responseClassification?.status || caseItem.lastResponseStatus) === 'EVASIVE_VAGUE'
+                        ? 'bg-rose-50 text-rose-700 border-rose-200'
+                        : (caseItem.responseClassification?.status || caseItem.lastResponseStatus) === 'FULLY_ANSWERED'
+                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                        : 'bg-amber-50 text-amber-800 border-amber-200'
+                    }`}
+                  >
+                    <Scale className="w-3 h-3" />
+                    <span>Last response: {(caseItem.responseClassification?.status || caseItem.lastResponseStatus).replace(/_/g, ' ')}</span>
+                  </Link>
+                )}
+
                 {/* ========================================================
-                    EDITABLE STATUS FIELD (Required Feature)
+                    EDITABLE STATUS FIELD
                    ======================================================== */}
                 <div className="flex items-center gap-2">
                   {!isEditingStatus ? (
                     <div className="flex items-center gap-1.5">
-                      <span className="text-xs font-bold uppercase px-3 py-1 rounded-full bg-slate-800 text-cyan-300 border border-slate-700">
+                      <span className="text-xs font-bold uppercase px-3 py-1 rounded-full bg-amber-50 text-amber-900 border-2 border-amber-300">
                         Status: {caseItem.status?.replace(/_/g, ' ')}
                       </span>
                       <button
                         onClick={() => setIsEditingStatus(true)}
-                        className="p-1 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-cyan-400 transition"
+                        className="p-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 transition cursor-pointer"
                         title="Edit Status"
                       >
                         <Edit3 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   ) : (
-                    <div className="flex items-center gap-2 bg-slate-950 p-1.5 rounded-xl border border-cyan-500/50">
+                    <div className="flex items-center gap-2 bg-white p-1.5 rounded-xl border-2 border-blue-400 shadow-sm">
                       <select
                         value={selectedStatus}
                         onChange={(e) => setSelectedStatus(e.target.value)}
-                        className="bg-slate-900 text-white text-xs font-semibold rounded-lg px-2.5 py-1 border border-slate-700 focus:outline-none focus:border-cyan-400"
+                        className="bg-slate-50 text-slate-900 text-xs font-semibold rounded-lg px-2.5 py-1 border border-slate-300 focus:outline-none focus:border-blue-500"
                         disabled={statusUpdateLoading}
                       >
                         <option value="submitted">Submitted (Waiting PIO)</option>
@@ -345,7 +363,7 @@ export const CaseDetail = () => {
                       <button
                         onClick={() => handleSaveStatus(selectedStatus)}
                         disabled={statusUpdateLoading}
-                        className="p-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white transition disabled:opacity-50"
+                        className="p-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition disabled:opacity-50 cursor-pointer"
                         title="Save Status"
                       >
                         {statusUpdateLoading ? (
@@ -361,7 +379,7 @@ export const CaseDetail = () => {
                           setIsEditingStatus(false);
                         }}
                         disabled={statusUpdateLoading}
-                        className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition"
+                        className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 transition cursor-pointer"
                         title="Cancel"
                       >
                         <X className="w-3.5 h-3.5" />
@@ -371,53 +389,60 @@ export const CaseDetail = () => {
                 </div>
 
                 {statusSuccessMessage && (
-                  <span className="text-[11px] font-semibold text-emerald-400 flex items-center gap-1">
+                  <span className="text-[11px] font-bold text-emerald-700 flex items-center gap-1">
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     <span>{statusSuccessMessage}</span>
                   </span>
                 )}
               </div>
 
-              <h1 className="text-xl sm:text-2xl font-bold text-white leading-snug">
+              <h1 className="text-xl sm:text-2xl font-black text-slate-900 leading-snug tracking-tight">
                 {caseItem.title}
               </h1>
-              <p className="text-xs text-slate-400">
-                Subject Category: <span className="text-slate-300 font-medium">{caseItem.subjectCategory || 'Public Administration'}</span>
+              <p className="text-xs text-slate-500 font-medium">
+                Subject Category: <span className="text-slate-800 font-bold bg-slate-100 px-2 py-0.5 rounded border border-slate-200">{caseItem.subjectCategory || 'Public Administration'}</span>
               </p>
             </div>
 
             {/* Header Actions */}
             <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+              <Link
+                to={`/cases/${caseItem.id}/response`}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-blue-50 hover:bg-blue-100 text-blue-700 border-2 border-blue-200 transition shadow-xs cursor-pointer"
+              >
+                <Scale className="w-3.5 h-3.5" />
+                <span>Classify Govt Response</span>
+              </Link>
+
               <button
                 onClick={() => setResponseModalOpen(true)}
-                className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition"
+                className="px-3.5 py-2 rounded-xl text-xs font-bold bg-white hover:bg-slate-50 text-slate-800 border-2 border-slate-300 hover:border-slate-400 transition shadow-xs cursor-pointer"
               >
                 Log PIO Reply
               </button>
 
               {/* ========================================================
-                  "GENERATE APPEAL DRAFT" BUTTON (Shown once deadline passed)
+                  "GENERATE APPEAL DRAFT" BUTTON
                  ======================================================== */}
               {isResponseDeadlinePassed ? (
                 <button
                   onClick={handleGenerateAppeal}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 shadow-lg shadow-amber-900/30 transition transform active:scale-95 ring-2 ring-amber-400/40"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition transform active:scale-95 cursor-pointer"
                 >
-                  <Sparkles className="w-4 h-4 text-amber-200" />
+                  <Sparkles className="w-4 h-4 text-white" />
                   <span>Generate Appeal Draft</span>
                 </button>
               ) : (
                 <div className="flex items-center gap-2">
-                  <div className="text-right text-xs text-slate-400">
-                    <span className="block font-medium text-amber-400">
+                  <div className="text-right text-xs">
+                    <span className="block font-bold text-amber-600">
                       {daysRemaining} days left in 30d window
                     </span>
-                    <span className="text-[10px] text-slate-500">Appeal enabled on expiry</span>
+                    <span className="text-[10px] text-slate-500 font-medium">Appeal enabled on expiry</span>
                   </div>
-                  {/* Convenient test helper for grading & testing appeal generation */}
                   <button
                     onClick={() => setSimulatePassed(true)}
-                    className="text-[10px] font-semibold text-slate-400 hover:text-cyan-300 underline"
+                    className="text-[10px] font-semibold text-slate-400 hover:text-blue-600 underline cursor-pointer"
                     title="Simulate 30-day window expiry to test appeal generator immediately"
                   >
                     (Simulate expiry)
@@ -431,19 +456,19 @@ export const CaseDetail = () => {
 
       {/* Statutory Overdue Banner if Response Deadline Has Passed */}
       {isResponseDeadlinePassed && (
-        <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-950/60 via-slate-900 to-amber-950/60 border border-amber-600/50 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="p-4 sm:p-5 rounded-2xl bg-amber-50 border-2 border-amber-300 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex items-start gap-3">
-            <div className="p-2.5 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30 shrink-0">
+            <div className="p-2.5 rounded-xl bg-amber-100 text-amber-800 border border-amber-300 shrink-0">
               <AlertTriangle className="w-5 h-5" />
             </div>
             <div className="space-y-1">
-              <h2 className="text-sm font-bold text-amber-300 flex items-center gap-2">
+              <h2 className="text-sm font-bold text-amber-950 flex items-center gap-2">
                 <span>Statutory 30-Day Response Window Expired</span>
-                <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-amber-900/80 text-amber-200 border border-amber-700/60">
+                <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-amber-200 text-amber-900 border border-amber-400">
                   Section 7(2) Deemed Refusal
                 </span>
               </h2>
-              <p className="text-xs text-slate-300 leading-relaxed max-w-2xl">
+              <p className="text-xs text-amber-900/90 leading-relaxed max-w-2xl">
                 The Public Information Officer did not furnish replies within the statutory timeframe.
                 You are legally empowered to file a First Appeal before the First Appellate Authority (FAA) under Section 19(1). All information must now be provided completely <strong>free of cost</strong> pursuant to Section 7(6).
               </p>
@@ -452,11 +477,11 @@ export const CaseDetail = () => {
 
           <button
             onClick={handleGenerateAppeal}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-md shadow-amber-500/20 transition transform active:scale-95 shrink-0"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-amber-600 hover:bg-amber-700 shadow-sm transition transform active:scale-95 shrink-0"
           >
-            <Sparkles className="w-4 h-4 text-slate-950" />
+            <Sparkles className="w-4 h-4 text-white" />
             <span>Generate Appeal Draft</span>
-            <ChevronRight className="w-4 h-4 text-slate-950" />
+            <ChevronRight className="w-4 h-4 text-white" />
           </button>
         </div>
       )}
@@ -464,18 +489,37 @@ export const CaseDetail = () => {
       {/* ========================================================
           TIMELINE OF STAGES: Filed → Response Due → First Appeal → Second Appeal
          ======================================================== */}
-      <div className="p-6 sm:p-7 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-xl space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+      <div className="p-6 sm:p-7 rounded-2xl bg-white border-2 border-slate-200 shadow-sm space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
           <div>
-            <h2 className="text-base font-bold text-white flex items-center gap-2">
-              <Clock className="w-4 h-4 text-cyan-400" />
+            <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+              <Clock className="w-4 h-4 text-blue-600" />
               <span>Statutory Progression Timeline</span>
             </h2>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-500 mt-0.5">
               Statutory trajectory under Right to Information Act, 2005: <strong>Filed &rarr; Response Due &rarr; First Appeal &rarr; Second Appeal</strong>
             </p>
+            {(caseItem.responseClassification?.status || caseItem.lastResponseStatus) && (
+              <div className="mt-2 text-xs flex items-center gap-2">
+                <span className="text-slate-500 font-semibold">Last response:</span>
+                <span className="font-mono text-slate-900 font-bold">
+                  {(caseItem.responseClassification?.status || caseItem.lastResponseStatus).replace(/_/g, ' ')}
+                </span>
+                {caseItem.responseClassification?.sectionCited && (
+                  <span className="text-blue-600 font-mono text-[11px]">
+                    (Section {caseItem.responseClassification.sectionCited})
+                  </span>
+                )}
+                <Link
+                  to={`/cases/${caseItem.id}/response`}
+                  className="text-blue-600 hover:underline text-[11px] font-medium ml-1"
+                >
+                  View Details &rarr;
+                </Link>
+              </div>
+            )}
           </div>
-          <span className="text-xs font-semibold text-cyan-400 bg-cyan-950/80 px-2.5 py-1 rounded-lg border border-cyan-800/60 self-start sm:self-auto">
+          <span className="text-xs font-bold text-blue-800 bg-blue-50 px-3 py-1 rounded-lg border border-blue-200 self-start sm:self-auto">
             Current Stage: {STATUTORY_STAGES[currentStageIdx].title}
           </span>
         </div>
@@ -490,12 +534,12 @@ export const CaseDetail = () => {
             return (
               <div
                 key={stage.id}
-                className={`relative p-4 rounded-xl border transition-all ${
+                className={`relative p-4 rounded-xl border-2 transition-all ${
                   isCurrent
-                    ? 'bg-slate-950 border-cyan-500 ring-2 ring-cyan-500/20 shadow-lg shadow-cyan-950/30'
+                    ? 'bg-blue-50/70 border-blue-500 ring-2 ring-blue-500/20 shadow-xs'
                     : isCompleted
-                    ? 'bg-emerald-950/20 border-emerald-800/50 text-slate-300'
-                    : 'bg-slate-950/50 border-slate-800 text-slate-400'
+                    ? 'bg-emerald-50/60 border-emerald-300 text-slate-700'
+                    : 'bg-slate-50/70 border-slate-200 text-slate-600'
                 }`}
               >
                 {/* Header: Stage Number & Status Badge */}
@@ -504,15 +548,15 @@ export const CaseDetail = () => {
                     <div
                       className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
                         isCompleted
-                          ? 'bg-emerald-500 text-slate-950'
+                          ? 'bg-emerald-600 text-white'
                           : isCurrent
-                          ? 'bg-cyan-500 text-slate-950 ring-2 ring-cyan-400/40'
-                          : 'bg-slate-800 text-slate-400'
+                          ? 'bg-blue-600 text-white ring-2 ring-blue-400/40'
+                          : 'bg-slate-200 text-slate-700'
                       }`}
                     >
                       {isCompleted ? <Check className="w-3.5 h-3.5 stroke-[3]" /> : idx + 1}
                     </div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
                       Stage 0{idx + 1}
                     </span>
                   </div>
@@ -520,10 +564,10 @@ export const CaseDetail = () => {
                   <span
                     className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
                       isCompleted
-                        ? 'bg-emerald-950 text-emerald-400 border border-emerald-800/50'
+                        ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
                         : isCurrent
-                        ? 'bg-cyan-950 text-cyan-400 border border-cyan-800/60 animate-pulse'
-                        : 'bg-slate-900 text-slate-500 border border-slate-800'
+                        ? 'bg-blue-600 text-white shadow-xs'
+                        : 'bg-slate-100 text-slate-600 border border-slate-300'
                     }`}
                   >
                     {isCompleted ? 'Completed' : isCurrent ? 'Active Stage' : 'Upcoming'}
@@ -531,39 +575,39 @@ export const CaseDetail = () => {
                 </div>
 
                 {/* Stage Title and Section Reference */}
-                <h3 className="text-sm font-bold text-white flex items-center gap-1.5">
+                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
                   <span>{stage.title}</span>
-                  <span className="text-[11px] font-normal text-cyan-400 font-mono">
+                  <span className="text-[11px] font-normal text-blue-600 font-mono">
                     ({stage.section})
                   </span>
                 </h3>
 
                 {/* Description */}
-                <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
+                <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">
                   {stage.description}
                 </p>
 
                 {/* Stage-specific date metadata */}
-                <div className="mt-3 pt-2 border-t border-slate-800/80 text-[11px]">
+                <div className="mt-3 pt-2 border-t border-slate-200 text-[11px]">
                   {idx === 0 && (
-                    <span className="text-slate-300">
+                    <span className="text-slate-600 font-medium">
                       Filed: {new Date(caseItem.filingDate).toLocaleDateString()}
                     </span>
                   )}
                   {idx === 1 && (
-                    <span className={daysRemaining <= 0 ? 'text-rose-400 font-bold' : 'text-amber-400 font-semibold'}>
+                    <span className={daysRemaining <= 0 ? 'text-rose-600 font-bold' : 'text-amber-700 font-bold'}>
                       {daysRemaining <= 0
                         ? '30-Day Limit Passed'
                         : `${daysRemaining} days remaining`}
                     </span>
                   )}
                   {idx === 2 && (
-                    <span className="text-slate-300">
+                    <span className="text-slate-600 font-medium">
                       {caseItem.appeals?.length > 0 ? 'Appeal Drafted' : 'Available if PIO defaults'}
                     </span>
                   )}
                   {idx === 3 && (
-                    <span className="text-slate-400">
+                    <span className="text-slate-500 font-medium">
                       Section 19(3) CIC / State Commission
                     </span>
                   )}
@@ -579,13 +623,13 @@ export const CaseDetail = () => {
         {/* Left Column (2 Cols): Formulated Queries, Documents, PIO Reply */}
         <div className="lg:col-span-2 space-y-6">
           {/* Queries Formulated under Section 6 */}
-          <div className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-xl space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <h2 className="text-base font-bold text-white flex items-center gap-2">
-                <FileText className="w-4 h-4 text-cyan-400" />
+          <div className="p-6 rounded-2xl bg-white border-2 border-slate-200 shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+              <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <FileText className="w-4 h-4 text-blue-600" />
                 <span>Formulated RTI Queries (Section 6(1))</span>
               </h2>
-              <span className="text-xs font-mono text-slate-400 bg-slate-800 px-2 py-0.5 rounded">
+              <span className="text-xs font-mono text-blue-800 bg-blue-50 border border-blue-200 px-3 py-0.5 rounded-full font-bold">
                 {caseItem.queries?.length || 0} questions
               </span>
             </div>
@@ -594,12 +638,12 @@ export const CaseDetail = () => {
               {caseItem.queries?.map((queryText, idx) => (
                 <div
                   key={idx}
-                  className="p-4 rounded-xl bg-slate-950/70 border border-slate-800/80 flex items-start gap-3.5 hover:border-slate-700 transition"
+                  className="p-4 rounded-xl bg-slate-50 hover:bg-slate-100/70 border-2 border-slate-200 flex items-start gap-3.5 transition"
                 >
-                  <span className="w-6 h-6 rounded-lg bg-cyan-950 text-cyan-400 text-xs font-bold flex items-center justify-center shrink-0 border border-cyan-800/50 mt-0.5">
+                  <span className="w-7 h-7 rounded-lg bg-blue-600 text-white text-xs font-bold flex items-center justify-center shrink-0 shadow-xs mt-0.5">
                     {idx + 1}
                   </span>
-                  <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-sans">
+                  <p className="text-xs sm:text-sm text-slate-900 leading-relaxed font-semibold">
                     {queryText}
                   </p>
                 </div>
@@ -609,56 +653,135 @@ export const CaseDetail = () => {
 
           {/* PIO Reply Summary (if recorded) */}
           {caseItem.pioResponseSummary && (
-            <div className="p-6 rounded-2xl bg-slate-900/90 border border-emerald-800/50 shadow-xl space-y-3">
+            <div className="p-6 rounded-2xl bg-white border-2 border-emerald-200 shadow-sm space-y-3">
               <div className="flex items-center justify-between">
-                <h2 className="text-base font-bold text-emerald-400 flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4" />
+                <h2 className="text-base font-bold text-emerald-800 flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                   <span>Public Information Officer (PIO) Response</span>
                 </h2>
                 {caseItem.pioResponseDate && (
-                  <span className="text-xs text-slate-400">
+                  <span className="text-xs text-slate-500 font-medium">
                     Received: {new Date(caseItem.pioResponseDate).toLocaleDateString()}
                   </span>
                 )}
               </div>
-              <div className="p-4 rounded-xl bg-slate-950/70 border border-slate-800 text-xs sm:text-sm text-slate-200 leading-relaxed">
+              <div className="p-4 rounded-xl bg-emerald-50/50 border border-emerald-200 text-xs sm:text-sm text-slate-900 leading-relaxed font-medium">
                 {caseItem.pioResponseSummary}
               </div>
             </div>
           )}
 
+          {/* Response Classification Analysis Card (if available) */}
+          {caseItem.responseClassification && (
+            <div className="p-6 rounded-2xl bg-white border-2 border-slate-200 shadow-sm space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
+                <div className="space-y-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                    Official Response Evaluation
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`inline-flex items-center gap-1.5 text-xs font-bold uppercase px-3 py-1 rounded-full border ${
+                        caseItem.responseClassification.status === 'DENIED' || caseItem.responseClassification.status === 'EVASIVE_VAGUE'
+                          ? 'bg-rose-50 text-rose-800 border-rose-200'
+                          : caseItem.responseClassification.status === 'FULLY_ANSWERED'
+                          ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                          : 'bg-amber-50 text-amber-800 border-amber-200'
+                      }`}
+                    >
+                      <span className="w-2 h-2 rounded-full bg-current" />
+                      <span>{caseItem.responseClassification.status.replace(/_/g, ' ')}</span>
+                    </span>
+                  </div>
+                </div>
+
+                <Link
+                  to={`/cases/${caseItem.id}/response`}
+                  className="text-xs font-bold text-blue-600 hover:underline"
+                >
+                  Re-evaluate / Update &rarr;
+                </Link>
+              </div>
+
+              {/* Section Cited */}
+              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs flex items-center justify-between">
+                <span className="font-semibold text-slate-600">Exemption Section Cited:</span>
+                <span className="font-mono font-bold text-slate-900 px-2.5 py-0.5 rounded bg-white border border-slate-200">
+                  {caseItem.responseClassification.sectionCited ? `Section ${caseItem.responseClassification.sectionCited}` : 'Not cited in reply'}
+                </span>
+              </div>
+
+              {/* Legal Warning if Denied without section */}
+              {!caseItem.responseClassification.sectionCited && caseItem.responseClassification.status === 'DENIED' && (
+                <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-start gap-2">
+                  <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                  <span>
+                    Denials are required to cite a specific exemption under Section 8(1) — this failure provides strong merit for a First Appeal.
+                  </span>
+                </div>
+              )}
+
+              {/* Reason */}
+              <div className="space-y-1">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Evaluation Reason:</span>
+                <p className="text-xs sm:text-sm text-slate-800 bg-slate-50 p-3.5 rounded-xl border border-slate-200 leading-relaxed font-medium">
+                  {caseItem.responseClassification.reason}
+                </p>
+              </div>
+
+              {/* Suggested Next Step Callout */}
+              <div className="p-4 rounded-xl bg-blue-50/70 border border-blue-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-blue-700">Recommended Action:</span>
+                  <p className="text-xs sm:text-sm font-bold text-slate-900 mt-0.5">
+                    {caseItem.responseClassification.suggestedNextStep}
+                  </p>
+                </div>
+
+                {caseItem.responseClassification.suggestedNextStep?.toLowerCase().includes('appeal') && (
+                  <button
+                    onClick={handleGenerateAppeal}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 transition shadow-sm shrink-0"
+                  >
+                    <span>Draft First Appeal</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Attached Documents / Acknowledgment Files */}
-          <div className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-xl space-y-4">
-            <h2 className="text-base font-bold text-white flex items-center gap-2">
-              <FileDown className="w-4 h-4 text-cyan-400" />
+          <div className="p-6 rounded-2xl bg-white border-2 border-slate-200 shadow-sm space-y-4">
+            <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+              <FileDown className="w-4 h-4 text-blue-600" />
               <span>Attached Documents & Filing Proofs</span>
             </h2>
 
             {caseItem.documents && caseItem.documents.length > 0 ? (
-              <div className="divide-y divide-slate-800 border border-slate-800 rounded-xl overflow-hidden">
+              <div className="divide-y divide-slate-200 border border-slate-200 rounded-xl overflow-hidden">
                 {caseItem.documents.map((doc) => (
                   <div
                     key={doc.id}
-                    className="p-3.5 bg-slate-950/60 flex items-center justify-between gap-4 text-xs"
+                    className="p-3.5 bg-slate-50 flex items-center justify-between gap-4 text-xs"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <FileText className="w-5 h-5 text-cyan-400 shrink-0" />
+                      <FileText className="w-5 h-5 text-blue-600 shrink-0" />
                       <div className="truncate">
-                        <p className="font-semibold text-slate-200 truncate">{doc.fileName}</p>
+                        <p className="font-semibold text-slate-900 truncate">{doc.fileName}</p>
                         <p className="text-[11px] text-slate-500">
                           {((doc.fileSize || 102400) / 1024).toFixed(1)} KB &bull;{' '}
                           {doc.category?.replace(/_/g, ' ') || 'Document'}
                         </p>
                       </div>
                     </div>
-                    <span className="text-[11px] font-semibold text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800/40 shrink-0">
+                    <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200 shrink-0">
                       Verified Receipt
                     </span>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="p-4 rounded-xl bg-slate-950/50 border border-slate-800 text-xs text-slate-400">
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-500 font-medium">
                 No acknowledgment file was uploaded during filing. You can retain your registration number for statutory monitoring.
               </div>
             )}
@@ -666,9 +789,9 @@ export const CaseDetail = () => {
 
           {/* Associated Appeal Drafts */}
           {caseItem.appeals && caseItem.appeals.length > 0 && (
-            <div className="p-6 rounded-2xl bg-slate-900/90 border border-amber-800/50 shadow-xl space-y-4">
-              <h2 className="text-base font-bold text-amber-300 flex items-center gap-2">
-                <FileCheck2 className="w-4 h-4" />
+            <div className="p-6 rounded-2xl bg-white border-2 border-amber-200 shadow-sm space-y-4">
+              <h2 className="text-base font-bold text-amber-900 flex items-center gap-2">
+                <FileCheck2 className="w-4 h-4 text-amber-600" />
                 <span>Associated Appeal Proceedings</span>
               </h2>
 
@@ -676,25 +799,25 @@ export const CaseDetail = () => {
                 {caseItem.appeals.map((appeal) => (
                   <div
                     key={appeal.id}
-                    className="p-4 rounded-xl bg-slate-950/80 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                    className="p-4 rounded-xl bg-amber-50/60 border border-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                   >
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-amber-400 uppercase">
+                        <span className="text-xs font-bold text-amber-900 uppercase">
                           {appeal.type?.replace('_', ' ')}
                         </span>
-                        <span className="font-mono text-xs text-slate-400">
+                        <span className="font-mono text-xs text-slate-700 font-semibold">
                           {appeal.appealNumber || appeal.id}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-300 leading-relaxed">
+                      <p className="text-xs text-slate-800 leading-relaxed font-medium">
                         {appeal.groundsSummary}
                       </p>
                     </div>
 
                     <Link
                       to={`/appeals/${appeal.id}`}
-                      className="inline-flex items-center gap-1 px-4 py-2 rounded-xl text-xs font-bold text-amber-300 bg-amber-950/60 hover:bg-amber-900/80 border border-amber-800/60 transition shrink-0"
+                      className="inline-flex items-center gap-1 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-amber-600 hover:bg-amber-700 transition shadow-sm shrink-0"
                     >
                       <span>Open Appeal Drafter</span>
                       <ChevronRight className="w-3.5 h-3.5" />
@@ -709,23 +832,23 @@ export const CaseDetail = () => {
         {/* Right Column: Public Authority & Contact Record */}
         <div className="space-y-6">
           {/* Target Authority Card */}
-          <div className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-xl space-y-4">
-            <h2 className="text-base font-bold text-white flex items-center gap-2">
-              <Building2 className="w-4 h-4 text-cyan-400" />
+          <div className="p-6 rounded-2xl bg-white border-2 border-slate-200 shadow-sm space-y-4">
+            <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+              <Building2 className="w-4 h-4 text-blue-600" />
               <span>Target Public Authority</span>
             </h2>
 
             <div className="space-y-3 text-xs">
               <div>
-                <span className="text-slate-400 block mb-0.5">Authority Name:</span>
-                <p className="font-bold text-white text-sm">
+                <span className="text-slate-500 font-medium block mb-1">Authority Name:</span>
+                <p className="font-bold text-slate-900 text-sm leading-snug">
                   {caseItem.authority?.name || 'Department of Public Authority'}
                 </p>
                 {caseItem.authority?.ministry && (
-                  <p className="text-xs text-cyan-400 mt-0.5">{caseItem.authority.ministry}</p>
+                  <p className="text-xs text-blue-700 mt-1 font-semibold">{caseItem.authority.ministry}</p>
                 )}
                 {caseItem.authority?.department && (
-                  <p className="text-[11px] text-slate-400 mt-0.5">
+                  <p className="text-[11px] text-slate-600 mt-0.5 font-medium">
                     Dept: {caseItem.authority.department}
                   </p>
                 )}
@@ -737,7 +860,7 @@ export const CaseDetail = () => {
                   href={portalUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-slate-950 bg-cyan-400 hover:bg-cyan-300 transition"
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition"
                 >
                   <span>Open Government Portal</span>
                   <ExternalLink className="w-3.5 h-3.5" />
@@ -746,33 +869,33 @@ export const CaseDetail = () => {
 
               {/* Central Public Information Officer (CPIO) */}
               {caseItem.authority?.pio && (
-                <div className="pt-3 border-t border-slate-800 space-y-2">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                <div className="pt-3 border-t border-slate-200 space-y-2">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
                     Designated CPIO
                   </span>
-                  <p className="font-semibold text-slate-200 text-xs">
+                  <p className="font-bold text-slate-900 text-xs">
                     {caseItem.authority.pio.name}
                   </p>
-                  <p className="text-slate-400 text-[11px]">
+                  <p className="text-slate-600 text-[11px] font-medium">
                     {caseItem.authority.pio.designation}
                   </p>
 
-                  <div className="space-y-1.5 pt-1 text-slate-300 text-[11px]">
+                  <div className="space-y-1.5 pt-1 text-slate-700 text-[11px] font-medium">
                     {caseItem.authority.pio.email && (
                       <div className="flex items-center gap-2">
-                        <Mail className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                        <Mail className="w-3.5 h-3.5 text-blue-600 shrink-0" />
                         <span className="truncate">{caseItem.authority.pio.email}</span>
                       </div>
                     )}
                     {caseItem.authority.pio.phone && (
                       <div className="flex items-center gap-2">
-                        <Phone className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                        <Phone className="w-3.5 h-3.5 text-blue-600 shrink-0" />
                         <span>{caseItem.authority.pio.phone}</span>
                       </div>
                     )}
                     {caseItem.authority.pio.address && (
                       <div className="flex items-start gap-2">
-                        <MapPin className="w-3.5 h-3.5 text-cyan-400 shrink-0 mt-0.5" />
+                        <MapPin className="w-3.5 h-3.5 text-blue-600 shrink-0 mt-0.5" />
                         <span className="leading-snug">{caseItem.authority.pio.address}</span>
                       </div>
                     )}
@@ -782,14 +905,14 @@ export const CaseDetail = () => {
 
               {/* First Appellate Authority */}
               {caseItem.authority?.firstAppellateAuthority && (
-                <div className="pt-3 border-t border-slate-800 space-y-1">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                <div className="pt-3 border-t border-slate-200 space-y-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
                     First Appellate Authority (FAA)
                   </span>
-                  <p className="font-semibold text-slate-200 text-xs">
+                  <p className="font-bold text-slate-900 text-xs">
                     {caseItem.authority.firstAppellateAuthority.name}
                   </p>
-                  <p className="text-slate-400 text-[11px]">
+                  <p className="text-slate-600 text-[11px] font-medium">
                     {caseItem.authority.firstAppellateAuthority.designation}
                   </p>
                 </div>
@@ -798,36 +921,36 @@ export const CaseDetail = () => {
           </div>
 
           {/* Filing & Fee Record */}
-          <div className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-xl space-y-3 text-xs">
-            <h2 className="text-sm font-bold text-white flex items-center gap-2">
-              <CreditCard className="w-4 h-4 text-cyan-400" />
+          <div className="p-6 rounded-2xl bg-white border-2 border-slate-200 shadow-sm space-y-3 text-xs">
+            <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <CreditCard className="w-4 h-4 text-blue-600" />
               <span>Filing & Payment Record</span>
             </h2>
 
-            <div className="space-y-2 text-slate-300">
+            <div className="space-y-2 text-slate-700 font-medium">
               <div className="flex items-center justify-between">
-                <span className="text-slate-400">Applicant:</span>
-                <span className="font-semibold text-white">{caseItem.applicant?.fullName || 'Anonymous'}</span>
+                <span className="text-slate-500">Applicant:</span>
+                <span className="font-bold text-slate-900">{caseItem.applicant?.fullName || 'Anonymous'}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-slate-400">Email:</span>
-                <span className="font-mono text-[11px] text-slate-300">{caseItem.applicant?.email || 'N/A'}</span>
+                <span className="text-slate-500">Email:</span>
+                <span className="font-mono text-[11px] text-slate-800 font-semibold">{caseItem.applicant?.email || 'N/A'}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-slate-400">Filing Date:</span>
-                <span>{new Date(caseItem.filingDate).toLocaleDateString()}</span>
+                <span className="text-slate-500">Filing Date:</span>
+                <span className="text-slate-800">{new Date(caseItem.filingDate).toLocaleDateString()}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-slate-400">Submission Mode:</span>
-                <span className="capitalize">{caseItem.submissionMode?.replace(/_/g, ' ') || 'Online Portal'}</span>
+                <span className="text-slate-500">Submission Mode:</span>
+                <span className="capitalize text-slate-800">{caseItem.submissionMode?.replace(/_/g, ' ') || 'Online Portal'}</span>
               </div>
-              <div className="flex items-center justify-between pt-1 border-t border-slate-800">
-                <span className="text-slate-400">Statutory Fee:</span>
-                <span className="font-bold text-emerald-400">₹{caseItem.feePaid || 10}</span>
+              <div className="flex items-center justify-between pt-1 border-t border-slate-200">
+                <span className="text-slate-500">Statutory Fee:</span>
+                <span className="font-bold text-emerald-700">₹{caseItem.feePaid || 10}</span>
               </div>
               <div className="flex items-center justify-between text-[11px]">
-                <span className="text-slate-400">Receipt Ref:</span>
-                <span className="font-mono text-slate-300">{caseItem.paymentReference || 'N/A'}</span>
+                <span className="text-slate-500">Receipt Ref:</span>
+                <span className="font-mono text-slate-700 font-semibold">{caseItem.paymentReference || 'N/A'}</span>
               </div>
             </div>
           </div>
@@ -836,10 +959,10 @@ export const CaseDetail = () => {
 
       {/* PIO Reply Modal */}
       {responseModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
-            <h3 className="text-lg font-bold text-white">Log PIO Response or Decision</h3>
-            <p className="text-xs text-slate-400">
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white border-2 border-slate-200 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
+            <h3 className="text-lg font-bold text-slate-900">Log PIO Response or Decision</h3>
+            <p className="text-xs text-slate-600">
               Record the decision summary, order number, or disclosure particulars received from the Public Information Officer.
             </p>
             <textarea
@@ -847,18 +970,18 @@ export const CaseDetail = () => {
               placeholder="e.g. PIO provided sanction order, however inspection logs were withheld citing Section 8(1)(j)..."
               value={responseSummary}
               onChange={(e) => setResponseSummary(e.target.value)}
-              className="w-full p-3.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:border-cyan-500"
+              className="w-full p-3.5 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <div className="flex justify-end gap-2 pt-2">
               <button
                 onClick={() => setResponseModalOpen(false)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white"
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900"
               >
                 Cancel
               </button>
               <button
                 onClick={handleRecordPioResponse}
-                className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-cyan-600 hover:bg-cyan-500 transition"
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 transition shadow-sm"
               >
                 Save & Update Case
               </button>

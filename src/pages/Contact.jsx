@@ -182,8 +182,8 @@ export const Contact = () => {
                 </div>
                 <div>
                   <span className="text-[11px] font-bold text-[var(--muted-foreground)] block uppercase">Email Support</span>
-                  <a href="mailto:support@rtiassist.org" className="text-xs font-bold text-[var(--foreground)] hover:text-[var(--primary)] underline">
-                    support@rtiassist.org
+                  <a href="mailto:darkpearl251103@gmail.com" className="text-xs font-bold text-[var(--foreground)] hover:text-[var(--primary)] underline">
+                    darkpearl251103@gmail.com
                   </a>
                 </div>
               </div>
@@ -204,7 +204,9 @@ export const Contact = () => {
                 </div>
                 <div>
                   <span className="text-[11px] font-bold text-[var(--muted-foreground)] block uppercase">Civic & Campus Outreach</span>
-                  <p className="text-xs font-bold text-[var(--foreground)]">outreach@rtiassist.org</p>
+                  <a href="mailto:darkpearl251103@gmail.com" className="text-xs font-bold text-[var(--foreground)] hover:text-[var(--primary)] underline">
+                    darkpearl251103@gmail.com
+                  </a>
                 </div>
               </div>
             </div>

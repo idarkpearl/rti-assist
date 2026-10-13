@@ -216,281 +216,40 @@ export const mockAuthorities = [
     },
     createdAt: '2026-02-10T10:00:00Z',
   },
+  {
+    id: 'auth-9',
+    name: 'Delhi Skill and Entrepreneurship University (DSEU)',
+    code: 'DSEU-GNCTD',
+    ministry: 'Department of Training and Technical Education (TTE), GNCTD',
+    department: 'State University & Technical Campuses',
+    level: 'state',
+    jurisdiction: 'Delhi NCT',
+    categoryTags: ['DSEU', 'College Funds', 'Okhla Campus', 'Polytechnic', 'State University', 'Campus Facilities', 'Student Fees', 'Technical Education'],
+    portalUrl: 'https://dseu.ac.in/rti',
+    applicationFee: 10,
+    paymentModes: ['Online Portal (e-RTI Delhi)', 'Postal Order', 'Demand Draft'],
+    pio: {
+      name: 'Dr. Ashwani Kumar',
+      designation: 'Assistant Registrar & Designated PIO',
+      email: 'pio@dseu.ac.in',
+      phone: '+91-11-2530-1400',
+      address: 'DSEU Head Office / Okhla Campus-II, New Delhi - 110020',
+    },
+    firstAppellateAuthority: {
+      name: 'Prof. (Dr.) Ashok Kumar K.',
+      designation: 'Registrar & First Appellate Authority (FAA)',
+      email: 'registrar@dseu.ac.in',
+      phone: '+91-11-2530-1401',
+      address: 'DSEU Head Office, Integrated Institute of Technology Complex, Sector-9, Dwarka, New Delhi - 110077',
+    },
+    createdAt: '2026-02-01T09:00:00Z',
+  },
 ];
 
 
-export const mockDeadlines = [
-  {
-    id: 'dl-1',
-    caseId: 'case-101',
-    title: 'PIO 30-Day Mandatory Response Window',
-    type: 'pio_response',
-    dueDate: '2026-10-12T18:30:00Z',
-    calculatedDays: 30,
-    daysRemaining: 15,
-    status: 'pending',
-    actSectionReference: 'RTI Act Sec 7(1)',
-    reminderSent: true,
-    notes: 'Application registered on central portal. PIO is required to furnish data or transfer within 30 days.',
-  },
-  {
-    id: 'dl-2',
-    caseId: 'case-102',
-    title: 'First Appeal Filing Window (Sec 19(1))',
-    type: 'first_appeal_window',
-    dueDate: '2026-10-02T18:30:00Z',
-    calculatedDays: 30,
-    daysRemaining: 4,
-    status: 'due_soon',
-    actSectionReference: 'RTI Act Sec 19(1)',
-    notes: 'No response received from PIO within 30 days. Statutory 30-day window to file First Appeal before FAA is active.',
-  },
-  {
-    id: 'dl-3',
-    caseId: 'case-103',
-    title: 'Life and Liberty Urgent Reply Window (48 Hours)',
-    type: 'life_and_liberty',
-    dueDate: '2026-09-29T11:00:00Z',
-    calculatedDays: 2,
-    daysRemaining: 1,
-    status: 'due_soon',
-    isLifeAndLiberty: true,
-    actSectionReference: 'RTI Act Sec 7(1) Proviso',
-    notes: 'Concerns medical emergency records and emergency detention inquiry.',
-  },
-  {
-    id: 'dl-4',
-    caseId: 'case-104',
-    title: 'Second Appeal Hearing at Central Information Commission',
-    type: 'hearing',
-    dueDate: '2026-11-15T10:00:00Z',
-    calculatedDays: 60,
-    daysRemaining: 49,
-    status: 'pending',
-    actSectionReference: 'RTI Act Sec 19(3)',
-    notes: 'Notice received from CIC Registrar. Case scheduled for hybrid hearing.',
-  },
-];
+export const mockDeadlines = [];
 
-export const mockAppealDrafts = [
-  {
-    id: 'appeal-201',
-    caseId: 'case-102',
-    type: 'first_appeal',
-    appealNumber: 'FAA-2026-DHE-0089',
-    authorityId: 'auth-1',
-    authorityName: 'Department of Higher Education',
-    appellateAuthorityName: 'Dr. Anita Karwal',
-    appellateAuthorityDesignation: 'Joint Secretary & First Appellate Authority',
-    appellant: {
-      fullName: 'Vikramaditya Roy',
-      email: 'vikram.roy@example.com',
-      phone: '+91-98765-43210',
-      address: 'Flat 402, Green Meadows, Indiranagar, Bengaluru - 560038',
-    },
-    originalApplicationDate: '2026-08-14T10:00:00Z',
-    originalPioName: 'Shri R. K. Sharma (CPIO)',
-    groundOfAppeal: 'no_response',
-    groundsSummary: 'Deemed refusal: 30 days elapsed with zero response or acknowledgment from CPIO under Sec 7(1).',
-    detailedGrounds: [
-      'The Appellant filed the original RTI application on 14th August 2026 seeking sanctioned intake and vacant faculty positions in Central Universities.',
-      'The mandatory period of 30 days prescribed under Section 7(1) of the RTI Act expired on 13th September 2026.',
-      'No information, interim reply, or transfer memo under Section 6(3) was furnished to the Appellant.',
-      'Under Section 7(2) of the RTI Act, failure to respond within 30 days is deemed refusal without lawful reason.',
-      'As per Section 7(6), the information must now be supplied completely free of cost to the Appellant.',
-    ],
-    reliefSought:
-      'Direct the CPIO to immediately furnish certified copies of the requested documents without any fees as per Sec 7(6), and initiate inquiry under Sec 20.',
-    draftContent: `# FIRST APPEAL UNDER SECTION 19(1) OF THE RIGHT TO INFORMATION ACT, 2005
+export const mockAppealDrafts = [];
 
-**To,**  
-The First Appellate Authority (FAA),  
-Department of Higher Education,  
-Ministry of Education, Government of India,  
-Shastri Bhawan, New Delhi - 110001.
+export const mockCases = [];
 
----
-
-### PARTICULARS OF THE APPELLANT:
-- **Full Name:** Vikramaditya Roy  
-- **Contact:** +91-98765-43210 | vikram.roy@example.com  
-- **Postal Address:** Flat 402, Green Meadows, Indiranagar, Bengaluru - 560038  
-
-### PARTICULARS OF THE PUBLIC INFORMATION OFFICER (PIO):
-- **Name/Designation:** Shri R. K. Sharma, Director & CPIO  
-- **Office:** Department of Higher Education, Shastri Bhawan  
-- **Original Registration / Reference:** RTI-2026-0042 (Filed: 14 Aug 2026)
-
----
-
-### GROUNDS OF APPEAL:
-1. **Deemed Refusal under Section 7(2):** The Appellant submitted an online application on 14th August 2026 requesting specific data on vacant professor posts across Central Universities.
-2. **Breach of Section 7(1) Timeline:** More than 30 statutory days have lapsed and the CPIO has completely failed to provide any reply, notice, or transfer.
-3. **Entitlement to Free Information under Section 7(6):** Since the public authority failed to provide the information within the statutory 30-day timeline, the Appellant is entitled to all information free of any charge.
-
----
-
-### PRAYER / RELIEF SOUGHT:
-1. Direct the CPIO to furnish full, legible, certified records requested in Items 1-4 of the original application within 7 working days.
-2. Order that all documentation be supplied free of cost pursuant to Section 7(6) of the RTI Act.
-3. Recommend penal action/advisory against the default under Section 20 of the Act.
-
-**Date:** September 27, 2026  
-**Place:** Bengaluru  
-*(Signed Electronically by Vikramaditya Roy)*`,
-    status: 'ready_to_send',
-    createdAt: '2026-09-20T14:30:00Z',
-    updatedAt: '2026-09-25T16:00:00Z',
-  },
-];
-
-export const mockCases = [
-  {
-    id: 'case-101',
-    trackingNumber: 'RTI-2026-DHE-0042',
-    title: 'Sanctioned vs Vacant Faculty Posts in Central Universities',
-    subjectCategory: 'Education & Employment',
-    summary: 'Inquiry into sanctioned, filled, and vacant positions of Assistant Professors, Associate Professors, and Professors across all 56 Central Universities.',
-    description: 'Detailed query regarding university-wise vacancy rosters, category breakdown (SC/ST/OBC/EWS/Gen), and recruitment drive timelines for 2025-2026.',
-    queries: [
-      'Certified copy of total sanctioned faculty positions across 56 Central Universities as of June 30, 2026.',
-      'List of vacant professor positions segregated by reserved categories (SC, ST, OBC, EWS, PwD).',
-      'Action taken report on filling vacancies via Mission Mode recruitment.',
-      'Total funds allocated and utilized for ad-hoc faculty honorarium in FY 2025-26.',
-    ],
-    applicant: {
-      fullName: 'Vikramaditya Roy',
-      email: 'vikram.roy@example.com',
-      phone: '+91-98765-43210',
-      address: 'Flat 402, Green Meadows, Indiranagar, Bengaluru - 560038',
-      isBelowPovertyLine: false,
-    },
-    authorityId: 'auth-1',
-    authority: mockAuthorities[0],
-    status: 'submitted',
-    isLifeAndLiberty: false,
-    filingDate: '2026-09-12T10:15:00Z',
-    submissionMode: 'online_portal',
-    feePaid: 10,
-    paymentReference: 'UPI-REF-992381203',
-    deadlines: [mockDeadlines[0]],
-    appeals: [],
-    documents: [
-      {
-        id: 'doc-1',
-        caseId: 'case-101',
-        fileName: 'RTI_Application_DHE_Faculty.pdf',
-        fileSize: 245000,
-        mimeType: 'application/pdf',
-        fileUrl: '#',
-        category: 'original_application',
-        uploadedAt: '2026-09-12T10:15:00Z',
-      },
-      {
-        id: 'doc-2',
-        caseId: 'case-101',
-        fileName: 'Payment_Challan_UPI_10.pdf',
-        fileSize: 84000,
-        mimeType: 'application/pdf',
-        fileUrl: '#',
-        category: 'payment_proof',
-        uploadedAt: '2026-09-12T10:16:00Z',
-      },
-    ],
-    tags: ['Education', 'UGC', 'Vacancies', 'Faculty'],
-    createdAt: '2026-09-12T10:15:00Z',
-    updatedAt: '2026-09-20T12:00:00Z',
-  },
-  {
-    id: 'case-102',
-    trackingNumber: 'RTI-2026-NHAI-0118',
-    title: 'Toll Collection Audits & Quality Inspection on NH-48 Stretch',
-    subjectCategory: 'Infrastructure & Public Works',
-    summary: 'Request for structural safety audit report and concessionaire revenue statements for Khed-Shivapur toll plaza on NH-48.',
-    description: 'Seeking certified inspection copies following multiple reports of severe pothole damage despite continuous user fee collection.',
-    queries: [
-      'Certified copy of the third-party safety and surface quality audit conducted on NH-48 between km 770 and km 830 in 2025-2026.',
-      'Total toll revenue collected by the concessionaire in the last 24 calendar months.',
-      'Notices or penalty orders issued by NHAI Project Director to the concessionaire regarding maintenance defaults.',
-    ],
-    applicant: {
-      fullName: 'Ananya Deshmukh',
-      email: 'ananya.deshmukh@civicvoice.org',
-      phone: '+91-98220-11223',
-      address: '74 Prabhat Road, Lane 4, Pune - 411004',
-      isBelowPovertyLine: false,
-    },
-    authorityId: 'auth-2',
-    authority: mockAuthorities[1],
-    status: 'first_appeal_pending',
-    isLifeAndLiberty: false,
-    filingDate: '2026-08-14T09:30:00Z',
-    submissionMode: 'online_portal',
-    feePaid: 10,
-    paymentReference: 'NETBANK-TX-7731201',
-    deadlines: [mockDeadlines[1]],
-    appeals: [mockAppealDrafts[0]],
-    documents: [
-      {
-        id: 'doc-3',
-        caseId: 'case-102',
-        fileName: 'NHAI_Toll_RTI_Receipt.pdf',
-        fileSize: 182000,
-        mimeType: 'application/pdf',
-        fileUrl: '#',
-        category: 'original_application',
-        uploadedAt: '2026-08-14T09:30:00Z',
-      },
-    ],
-    tags: ['Roads', 'Toll Plaza', 'NHAI', 'Safety Audit'],
-    createdAt: '2026-08-14T09:30:00Z',
-    updatedAt: '2026-09-25T16:00:00Z',
-  },
-  {
-    id: 'case-103',
-    trackingNumber: 'RTI-2026-BMC-0902',
-    title: 'Emergency Storm Water Drain De-silting Expenditure in Ward K-East',
-    subjectCategory: 'Municipal Administration',
-    summary: 'Pre-monsoon de-silting contract records, tender specifications, and weighbridge slips for K-East Ward (Andheri East).',
-    description: 'Life and safety concern due to chronic waterlogging near municipal hospital entrance during heavy rainfall.',
-    queries: [
-      'Name of the vendor and contractor awarded pre-monsoon storm water drain cleaning in Ward K-East for 2026.',
-      'Weighbridge measurement slips for silt lifted and transported to designated dumping grounds.',
-      'Total sanctioned expenditure vs amount disbursed to contractor till date.',
-    ],
-    applicant: {
-      fullName: 'Rohit K. Nair',
-      email: 'rohit.nair@mumbairights.in',
-      phone: '+91-99300-88412',
-      address: 'B-12, Green Heights, Chakala, Andheri East, Mumbai - 400093',
-      isBelowPovertyLine: false,
-    },
-    authorityId: 'auth-3',
-    authority: mockAuthorities[2],
-    status: 'pio_replied',
-    isLifeAndLiberty: true,
-    filingDate: '2026-09-26T11:00:00Z',
-    submissionMode: 'in_person',
-    feePaid: 10,
-    paymentReference: 'CASH-RECEIPT-40912',
-    deadlines: [mockDeadlines[2]],
-    appeals: [],
-    documents: [
-      {
-        id: 'doc-4',
-        caseId: 'case-103',
-        fileName: 'BMC_Ward_KEast_Stamped_Application.pdf',
-        fileSize: 450000,
-        mimeType: 'application/pdf',
-        fileUrl: '#',
-        category: 'original_application',
-        uploadedAt: '2026-09-26T11:00:00Z',
-      },
-    ],
-    pioResponseSummary: 'PIO provided partial work-order details; weighbridge computerized slips withheld citing compilation difficulty.',
-    pioResponseDate: '2026-09-27T08:30:00Z',
-    tags: ['BMC', 'Monsoon', 'Flooding', 'Municipal'],
-    createdAt: '2026-09-26T11:00:00Z',
-    updatedAt: '2026-09-27T08:30:00Z',
-  },
-];

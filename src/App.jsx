@@ -8,6 +8,7 @@ import { Intake } from './pages/Intake.jsx';
 import { Dashboard } from './pages/Dashboard.jsx';
 import { CaseDetail } from './pages/CaseDetail.jsx';
 import { AppealDraftDetail } from './pages/AppealDraftDetail.jsx';
+import { ResponseClassification } from './pages/ResponseClassification.jsx';
 import { Directory } from './pages/Directory.jsx';
 import { CaseFiling } from './pages/CaseFiling.jsx';
 import { Login } from './pages/Login.jsx';
@@ -27,7 +28,6 @@ export function App() {
           <Route element={<Layout />}>
             {/* Public Routes */}
             <Route path="/" element={<Home />} />
-            <Route path="/intake" element={<Intake />} />
             <Route path="/directory" element={<Directory />} />
             <Route path="/login" element={<Login />} />
             <Route path="/about" element={<About />} />
@@ -37,11 +37,13 @@ export function App() {
             <Route path="/disclaimer" element={<Disclaimer />} />
             <Route path="/rti-act" element={<RtiActGuide />} />
 
-            {/* Protected Routes: /dashboard, /cases/*, /appeals/* */}
+            {/* Protected Routes (Requires Sign In): Drafting /intake, Dashboard, Filings, Appeals */}
             <Route element={<ProtectedRoute />}>
+              <Route path="/intake" element={<Intake />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/cases/new/filing" element={<CaseFiling />} />
               <Route path="/cases/:id" element={<CaseDetail />} />
+              <Route path="/cases/:id/response" element={<ResponseClassification />} />
               <Route path="/appeals/:id" element={<AppealDraftDetail />} />
             </Route>
 

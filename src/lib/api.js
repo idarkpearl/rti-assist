@@ -317,9 +317,64 @@ export async function recommendAuthority(draftText) {
 }
 
 
+export async function classifyResponse(responseText, requestContext = null) {
+  if (!responseText || typeof responseText !== 'string' || !responseText.trim()) {
+    throw new ApiError(400, 'Response text is required and must be non-empty', 'VALIDATION_ERROR');
+  }
+
+  return withRetry(async () => {
+    // 1. Prioritize calling the live LLM microservice if available
+    if (LLM_SERVICE_URL) {
+      try {
+        const res = await fetch(`${LLM_SERVICE_URL}/classify-response`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ responseText: responseText.trim(), requestContext }),
+        });
+        if (res.ok) {
+          return await res.json();
+        }
+      } catch (llmErr) {
+        console.warn('[RTI Assist] Live LLM microservice unreachable for classify-response:', llmErr?.message);
+      }
+    }
+
+    // 2. Fallback to mock implementation if mock is enabled
+    if (isMockEnabled) {
+      return await mockApi.classifyResponse(responseText, requestContext);
+    }
+
+    // 3. Fallback to standard backend URL
+    try {
+      return await api.post('/classify-response', { responseText: responseText.trim(), requestContext });
+    } catch (err) {
+      const message = err instanceof ApiError ? err.message : (err?.message || 'Failed to classify government response');
+      const statusCode = err?.statusCode || 500;
+      throw new ApiError(statusCode, `Backend AI Service Error: ${message}`, 'AI_CLASSIFICATION_FAILED', err);
+    }
+  }, 1, 500);
+}
+
+export async function saveResponseClassification(caseId, classificationData) {
+  if (isMockEnabled) {
+    return mockApi.saveResponseClassification(caseId, classificationData);
+  }
+  return api.patch(`/cases/${caseId}`, {
+    responseClassification: classificationData,
+    lastResponseStatus: classificationData.status,
+    pioResponseSummary: classificationData.reason,
+    pioResponseDate: new Date().toISOString(),
+    status: classificationData.status === 'DENIED' || classificationData.status === 'EVASIVE_VAGUE'
+      ? 'pio_replied'
+      : undefined,
+  });
+}
+
 // Attach helpers directly on api object so api.draftRequest(...) and api.recommendAuthority(...) can be called
 api.draftRequest = draftRequest;
 api.recommendAuthority = recommendAuthority;
+api.classifyResponse = classifyResponse;
+api.saveResponseClassification = saveResponseClassification;
 api.getAuthorities = getAuthorities;
 api.createCase = createCase;
 api.getCase = getCase;
@@ -342,6 +397,7 @@ export const casesApi = {
     isMockEnabled
       ? Promise.resolve({ success: true })
       : api.delete(`/cases/${id}`),
+  saveResponseClassification,
 };
 
 export const authoritiesApi = {
@@ -372,3 +428,50 @@ export const appealsApi = {
   create: createAppealDraft,
   generateFromCase: draftAppeal,
 };
+
+export async function sendOtp(email, name) {
+  if (isMockEnabled) {
+    return { success: true, message: 'Mock OTP sent', devOtp: '123456' };
+  }
+  return api.post('/auth/send-otp', { email, name });
+}
+
+export async function verifyOtp(email, otp, name) {
+  if (isMockEnabled) {
+    return {
+      success: true,
+      token: 'mock-jwt-token',
+      user: { id: 'usr-mock', email, name: name || 'Citizen User', role: 'citizen', emailVerified: true },
+    };
+  }
+  return api.post('/auth/verify-otp', { email, otp, name });
+}
+
+export async function setPassword(password, email) {
+  if (isMockEnabled) {
+    return { success: true, message: 'Password set successfully (mock)' };
+  }
+  return api.post('/auth/set-password', { password, email });
+}
+
+export async function checkEmail(email) {
+  if (isMockEnabled) {
+    return { exists: false, hasPassword: false };
+  }
+  return api.post('/auth/check-email', { email });
+}
+
+api.sendOtp = sendOtp;
+api.verifyOtp = verifyOtp;
+api.setPassword = setPassword;
+api.checkEmail = checkEmail;
+
+export const authApi = {
+  sendOtp,
+  verifyOtp,
+  setPassword,
+  checkEmail,
+  login: (email, password) => api.post('/auth/login', { email, password }),
+};
+
+

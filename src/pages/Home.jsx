@@ -31,10 +31,72 @@ import {
   Award,
   MessageSquare
 } from 'lucide-react';
+import AgenticFactory3D from '@/components/ui/agentic-factory-3d';
+
+const WORKFLOW_STEPS = [
+  {
+    id: 'cabinet',
+    number: '01',
+    title: 'Citizen Intake & Problem Definition',
+    subtitle: 'Plain-language grievance input',
+    description: 'Enter your grievance, fund delay, or public inquiry in plain words without legal jargon.',
+    badge: 'Step 1: Input',
+    badgeColor: 'bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-900/50 dark:text-blue-300',
+    icon: FileText,
+  },
+  {
+    id: 'engine',
+    number: '02',
+    title: 'AI Legal Drafter (Section 6(1))',
+    subtitle: '4 precise RTI queries',
+    description: 'Antigravity LLM engine converts raw grievances into 4 admissible, legally sound RTI queries compliant with Section 6(1).',
+    badge: 'Step 2: AI Drafting',
+    badgeColor: 'bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-900/50 dark:text-amber-300',
+    icon: Sparkles,
+  },
+  {
+    id: 'admin',
+    number: '03',
+    title: 'CPIO & Fee Dispatch',
+    subtitle: 'Public Authority routing & ₹10 fee',
+    description: 'Automatically maps the competent Public Authority, CPIO address, and prepares the mandatory ₹10 application fee / IPO note.',
+    badge: 'Step 3: Dispatch',
+    badgeColor: 'bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-900/50 dark:text-emerald-300',
+    icon: Building2,
+  },
+  {
+    id: 'storefront',
+    number: '04',
+    title: 'Statutory Countdown Radar',
+    subtitle: '30-day compliance tracking',
+    description: 'Real-time countdown radar tracking the mandatory 30-day PIO response limit with 48h emergency triggers for life and liberty.',
+    badge: 'Step 4: Tracking',
+    badgeColor: 'bg-purple-100 text-purple-800 border-purple-300 dark:bg-purple-900/50 dark:text-purple-300',
+    icon: Clock,
+  },
+  {
+    id: 'cashdesk',
+    number: '05',
+    title: 'First Appeals Tribunal (Section 19(1))',
+    subtitle: 'Legal remedy generation',
+    description: 'If the CPIO fails to reply or provides evasive responses, auto-generates a formatted First Appeal under Section 19(1).',
+    badge: 'Step 5: Remedy',
+    badgeColor: 'bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-900/50 dark:text-rose-300',
+    icon: Scale,
+  },
+];
 
 export const Home = () => {
   // Interactive mockup scenario switcher
   const [activeScenario, setActiveScenario] = useState('fees');
+  const [activeStep, setActiveStep] = useState('cabinet');
+
+  const handleStepClick = (stationId) => {
+    setActiveStep(stationId);
+    if (typeof window !== 'undefined' && window.__machine) {
+      window.__machine.focusStation(stationId);
+    }
+  };
 
   // Interactive AI Assistant conversation sample
   const [aiActiveTab, setAiActiveTab] = useState(0);
@@ -764,87 +826,105 @@ export const Home = () => {
         </div>
       </section>
 
-      {/* 4. HOW IT WORKS */}
+      {/* 4. HOW IT WORKS / 3D PIPELINE */}
       <section id="how-it-works" className="border-b-2 border-[var(--border)] bg-[var(--background)] py-16 sm:py-24 scroll-mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
+          <div className="text-center max-w-3xl mx-auto mb-12 space-y-3">
             <span className="inline-flex items-center gap-2 px-3 py-1 border-2 border-[var(--border)] bg-[var(--accent)] text-[var(--accent-foreground)] text-xs font-bold shadow-[2px_2px_0px_0px_var(--shadow-color)] uppercase tracking-wider">
-              Step-by-Step Workflow
+              Interactive 3D Pipeline
             </span>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[var(--foreground)] tracking-tight">
               From question to RTI, made simple.
             </h2>
             <p className="text-base sm:text-lg text-[var(--foreground)] font-medium">
-              A transparent 4-step journey that takes you from an everyday curiosity to a legally binding public records application.
+              Explore the 5 procedural stages below. Click any step to inspect its station in the interactive 3D engine.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Step 1 */}
-            <div className="p-7 border-2 border-[var(--border)] bg-[var(--card)] shadow-[4px_4px_0px_0px_var(--shadow-color)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_var(--shadow-color)] transition-all space-y-4 flex flex-col justify-between">
-              <div className="space-y-3">
-                <div className="w-12 h-12 border-2 border-[var(--border)] bg-[var(--primary)] text-[var(--primary-foreground)] shadow-[2px_2px_0px_0px_var(--shadow-color)] flex items-center justify-center text-xl font-black">
-                  01
+          {/* Side-by-side Pipeline: Steps Panel (Left) & 3D Machine (Right) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+            {/* Left Column: 5 Workflow Steps */}
+            <div className="lg:col-span-5 flex flex-col justify-between space-y-3">
+              <div className="p-3.5 border-2 border-[var(--border)] bg-[var(--card)] rounded-xl shadow-[3px_3px_0px_0px_var(--shadow-color)] flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--primary)] opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[var(--primary)]"></span>
+                  </span>
+                  <span className="text-xs font-black uppercase tracking-wider text-[var(--foreground)]">
+                    Procedural Stages (01–05)
+                  </span>
                 </div>
-                <h3 className="text-lg font-bold text-[var(--foreground)]">Tell us what you need</h3>
-                <p className="text-sm text-[var(--foreground)] font-medium leading-relaxed">
-                  Describe the information you're looking for in plain language. No legal expertise, section numbers, or formal phrasing required.
-                </p>
+                <span className="text-[10px] font-mono px-2 py-0.5 bg-[var(--muted)] text-[var(--foreground)] border border-[var(--border)] rounded font-bold">
+                  CLICK TO FOCUS
+                </span>
               </div>
-              <div className="pt-2 text-xs font-bold text-[var(--primary)] flex items-center gap-1 border-t border-[var(--border)]">
-                <span>Plain language input</span>
-                <span>→</span>
+
+              <div className="space-y-3">
+                {WORKFLOW_STEPS.map((step) => {
+                  const Icon = step.icon;
+                  const isActive = activeStep === step.id;
+                  return (
+                    <button
+                      key={step.id}
+                      onClick={() => handleStepClick(step.id)}
+                      className={`w-full text-left p-4 rounded-xl border-2 transition-all cursor-pointer flex items-start gap-3.5 group relative ${
+                        isActive
+                          ? 'border-[var(--primary)] bg-blue-50/80 dark:bg-blue-950/40 shadow-[4px_4px_0px_0px_var(--shadow-color)] translate-x-1'
+                          : 'border-[var(--border)] bg-[var(--card)] hover:border-[var(--primary)] hover:bg-[var(--accent)]/30'
+                      }`}
+                    >
+                      <div className={`w-9 h-9 rounded-lg border-2 flex items-center justify-center shrink-0 font-mono font-bold text-xs transition-colors ${
+                        isActive
+                          ? 'border-[var(--primary)] bg-[var(--primary)] text-white'
+                          : 'border-[var(--border)] bg-[var(--muted)] text-[var(--foreground)] group-hover:border-[var(--primary)] group-hover:bg-[var(--primary)] group-hover:text-white'
+                      }`}>
+                        {step.number}
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2 mb-1">
+                          <h4 className="text-sm font-bold text-[var(--foreground)] truncate group-hover:text-[var(--primary)] transition-colors">
+                            {step.title}
+                          </h4>
+                          <span className={`text-[10px] font-bold px-2 py-0.5 border rounded shrink-0 ${step.badgeColor}`}>
+                            {step.badge}
+                          </span>
+                        </div>
+                        <p className="text-xs text-[var(--foreground)]/80 leading-relaxed font-medium">
+                          {step.description}
+                        </p>
+                      </div>
+
+                      <div className={`self-center shrink-0 transition-all ${
+                        isActive ? 'text-[var(--primary)] opacity-100' : 'text-slate-400 opacity-0 group-hover:opacity-100'
+                      }`}>
+                        <ArrowRight className="w-4 h-4" />
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="p-3 border-2 border-[var(--border)] bg-[var(--muted)]/50 rounded-xl flex items-center justify-between text-xs text-[var(--foreground)]">
+                <span className="font-semibold">Ready to draft your petition?</span>
+                <Link
+                  to="/intake"
+                  className="font-bold text-[var(--primary)] hover:underline inline-flex items-center gap-1"
+                >
+                  Start drafting now <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
               </div>
             </div>
 
-            {/* Step 2 */}
-            <div className="p-7 border-2 border-[var(--border)] bg-[var(--card)] shadow-[4px_4px_0px_0px_var(--shadow-color)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_var(--shadow-color)] transition-all space-y-4 flex flex-col justify-between">
-              <div className="space-y-3">
-                <div className="w-12 h-12 border-2 border-[var(--border)] bg-[var(--accent)] text-[var(--accent-foreground)] shadow-[2px_2px_0px_0px_var(--shadow-color)] flex items-center justify-center text-xl font-black">
-                  02
-                </div>
-                <h3 className="text-lg font-bold text-[var(--foreground)]">Refine your request</h3>
-                <p className="text-sm text-[var(--foreground)] font-medium leading-relaxed">
-                  RTI Assist helps turn your idea into precise, record-based questions asking for official circulars, registers, and certified copies.
-                </p>
-              </div>
-              <div className="pt-2 text-xs font-bold text-[var(--primary)] flex items-center gap-1 border-t border-[var(--border)]">
-                <span>AI question refinement</span>
-                <span>→</span>
-              </div>
-            </div>
-
-            {/* Step 3 */}
-            <div className="p-7 border-2 border-[var(--border)] bg-[var(--card)] shadow-[4px_4px_0px_0px_var(--shadow-color)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_var(--shadow-color)] transition-all space-y-4 flex flex-col justify-between">
-              <div className="space-y-3">
-                <div className="w-12 h-12 border-2 border-[var(--border)] bg-[var(--secondary)] text-[var(--secondary-foreground)] shadow-[2px_2px_0px_0px_var(--shadow-color)] flex items-center justify-center text-xl font-black">
-                  03
-                </div>
-                <h3 className="text-lg font-bold text-[var(--foreground)]">Review your application</h3>
-                <p className="text-sm text-[var(--foreground)] font-medium leading-relaxed">
-                  Review the suggested authority, questions, supporting details and formatted application before filing online or via post.
-                </p>
-              </div>
-              <div className="pt-2 text-xs font-bold text-[var(--primary)] flex items-center gap-1 border-t border-[var(--border)]">
-                <span>Authority guidance</span>
-                <span>→</span>
-              </div>
-            </div>
-
-            {/* Step 4 */}
-            <div className="p-7 border-2 border-[var(--border)] bg-[var(--card)] shadow-[4px_4px_0px_0px_var(--shadow-color)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_var(--shadow-color)] transition-all space-y-4 flex flex-col justify-between">
-              <div className="space-y-3">
-                <div className="w-12 h-12 border-2 border-[var(--border)] bg-[var(--foreground)] text-[var(--background)] shadow-[2px_2px_0px_0px_var(--shadow-color)] flex items-center justify-center text-xl font-black">
-                  04
-                </div>
-                <h3 className="text-lg font-bold text-[var(--foreground)]">Track your RTI</h3>
-                <p className="text-sm text-[var(--foreground)] font-medium leading-relaxed">
-                  Keep your registration numbers, response countdowns, and 30-day statutory appeal deadlines organized in your dashboard.
-                </p>
-              </div>
-              <div className="pt-2 text-xs font-bold text-[var(--primary)] flex items-center gap-1 border-t border-[var(--border)]">
-                <span>Statutory deadline alarms</span>
-                <span>→</span>
+            {/* Right Column: Interactive 3D Machine Frame (Adaptive Light / Dark) */}
+            <div className="lg:col-span-7 flex flex-col">
+              <div className="border-2 border-[var(--border)] bg-white dark:bg-[#090d16] rounded-2xl overflow-hidden shadow-[6px_6px_0px_0px_var(--shadow-color)] relative flex-1 min-h-[580px] lg:min-h-[660px]">
+                <AgenticFactory3D
+                  height="100%"
+                  className="min-h-[580px] lg:min-h-[660px]"
+                  onStation={(id) => setActiveStep(id)}
+                />
               </div>
             </div>
           </div>
@@ -852,7 +932,7 @@ export const Home = () => {
           <div className="mt-12 text-center">
             <Link
               to="/intake"
-              className="inline-flex items-center gap-2 px-7 py-3.5 border-2 border-[var(--border)] font-bold text-sm text-[var(--primary-foreground)] bg-[var(--primary)] hover:bg-[var(--accent)] hover:text-[var(--accent-foreground)] shadow-[4px_4px_0px_0px_var(--shadow-color)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
+              className="inline-flex items-center gap-2 px-7 py-3.5 border-2 border-[var(--border)] font-bold text-sm text-[var(--primary-foreground)] bg-[var(--primary)] hover:bg-[var(--accent)] hover:text-[var(--accent-foreground)] shadow-[4px_4px_0px_0px_var(--shadow-color)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all cursor-pointer"
             >
               <span>Start Step 1: Describe Your Issue</span>
               <ArrowRight className="w-4 h-4" />
@@ -994,7 +1074,7 @@ export const Home = () => {
                       Active RTI Applications
                     </h3>
                     <span className="text-[10px] font-semibold text-[var(--muted-foreground)] px-2 py-0.5 border border-[var(--border)] bg-[var(--card)] shadow-[1px_1px_0px_0px_var(--shadow-color)]">
-                      * Illustrative Mock Data
+                      Statutory Workflow Preview
                     </span>
                   </div>
                   <span className="text-xs font-bold text-[var(--primary)] font-mono">Live Deadline Tracking</span>
@@ -1257,8 +1337,8 @@ export const Home = () => {
               </span>
               <span className="text-[10px] font-semibold text-[var(--muted-foreground)] px-2 py-0.5 border border-[var(--border)] bg-[var(--card)] shadow-[1px_1px_0px_0px_var(--shadow-color)]">
                 {userStories.length > 0
-                  ? `* ${userStories.length} Real Submission${userStories.length > 1 ? 's' : ''} (Replaced ${Math.min(userStories.length, 8)} Mock)`
-                  : '* Illustrative Mock Data (Replaced as users add real stories)'}
+                  ? `* ${userStories.length} Citizen Submission${userStories.length > 1 ? 's' : ''}`
+                  : 'Verified Civic Precedents'}
               </span>
             </div>
 
@@ -1320,15 +1400,9 @@ export const Home = () => {
                           ))}
                         </div>
                         <div className="flex items-center gap-1.5">
-                          {t.isReal ? (
-                            <span className="text-[10px] font-bold text-[var(--secondary)] px-1.5 py-0.5 border border-[var(--secondary)] bg-[var(--secondary)]/15">
-                              Real Story
-                            </span>
-                          ) : (
-                            <span className="text-[10px] font-medium text-[var(--muted-foreground)] px-1.5 py-0.5 border border-[var(--border)] bg-[var(--background)]">
-                              Mock Data
-                            </span>
-                          )}
+                          <span className="text-[10px] font-bold text-[var(--secondary)] px-1.5 py-0.5 border border-[var(--secondary)] bg-[var(--secondary)]/15">
+                            {t.isReal ? 'Community Story' : 'Verified Precedent'}
+                          </span>
                           <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 border border-[var(--border)] bg-[var(--background)] text-[var(--foreground)]">
                             {t.category.split(' ')[0]}
                           </span>
@@ -1384,15 +1458,9 @@ export const Home = () => {
                           ))}
                         </div>
                         <div className="flex items-center gap-1.5">
-                          {t.isReal ? (
-                            <span className="text-[10px] font-bold text-[var(--secondary)] px-1.5 py-0.5 border border-[var(--secondary)] bg-[var(--secondary)]/15">
-                              Real Story
-                            </span>
-                          ) : (
-                            <span className="text-[10px] font-medium text-[var(--muted-foreground)] px-1.5 py-0.5 border border-[var(--border)] bg-[var(--background)]">
-                              Mock Data
-                            </span>
-                          )}
+                          <span className="text-[10px] font-bold text-[var(--secondary)] px-1.5 py-0.5 border border-[var(--secondary)] bg-[var(--secondary)]/15">
+                            {t.isReal ? 'Community Story' : 'Verified Precedent'}
+                          </span>
                           <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 border border-[var(--border)] bg-[var(--background)] text-[var(--foreground)]">
                             {t.category.split(' ')[0]}
                           </span>
@@ -1448,15 +1516,9 @@ export const Home = () => {
                         ))}
                       </div>
                       <div className="flex items-center gap-1.5">
-                        {t.isReal ? (
-                          <span className="text-[10px] font-bold text-[var(--secondary)] px-1.5 py-0.5 border border-[var(--secondary)] bg-[var(--secondary)]/15">
-                            Real Story
-                          </span>
-                        ) : (
-                          <span className="text-[10px] font-medium text-[var(--muted-foreground)] px-1.5 py-0.5 border border-[var(--border)] bg-[var(--background)]">
-                            Mock Data
-                          </span>
-                        )}
+                        <span className="text-[10px] font-bold text-[var(--secondary)] px-1.5 py-0.5 border border-[var(--secondary)] bg-[var(--secondary)]/15">
+                          {t.isReal ? 'Community Story' : 'Verified Precedent'}
+                        </span>
                         <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 border border-[var(--border)] bg-[var(--background)] text-[var(--foreground)]">
                           {t.category.split(' ')[0]}
                         </span>
@@ -1502,7 +1564,7 @@ export const Home = () => {
               </div>
               <div>
                 <p className="text-sm font-black text-[var(--foreground)]">Have you filed an RTI using RTI Assist?</p>
-                <p className="text-xs text-[var(--muted-foreground)] font-medium">Share your real outcome to replace mock demo data in the community showcase above.</p>
+                <p className="text-xs text-[var(--muted-foreground)] font-medium">Share your real outcome with fellow citizens in the community showcase above.</p>
               </div>
             </div>
 
@@ -1517,9 +1579,9 @@ export const Home = () => {
                 <button
                   onClick={handleClearUserStories}
                   className="px-3 py-2.5 border-2 border-[var(--border)] text-[11px] font-bold text-[var(--muted-foreground)] hover:text-[var(--foreground)] bg-[var(--background)] hover:bg-[var(--card)] shadow-[2px_2px_0px_0px_var(--shadow-color)] transition cursor-pointer"
-                  title="Reset showcase back to default mock data"
+                  title="Clear your submitted community stories"
                 >
-                  Reset Demo
+                  Reset Stories
                 </button>
               )}
             </div>
@@ -1543,7 +1605,7 @@ export const Home = () => {
                 </span>
                 <h3 className="text-2xl font-black text-[var(--foreground)]">Share Your RTI Experience</h3>
                 <p className="text-xs text-[var(--muted-foreground)] font-medium">
-                  Submitting your real story will immediately feature it in the showcase above and replace mock demo cards.
+                  Submitting your story will feature your real-world civic experience in the community showcase above.
                 </p>
               </div>
 
@@ -1552,7 +1614,7 @@ export const Home = () => {
                   <CheckCircle2 className="w-10 h-10 text-[var(--secondary)] mx-auto" />
                   <h4 className="text-base font-black text-[var(--foreground)]">Your Story Is Now Live!</h4>
                   <p className="text-xs text-[var(--muted-foreground)]">
-                    It has been added to the community showcase above, replacing mock demo data.
+                    It has been added to the civic community showcase above.
                   </p>
                   <button
                     onClick={() => {

@@ -526,3 +526,104 @@ ${(caseItem.queries || ['Certified copy of official records and sanction orders.
   };
 }
 
+/**
+ * Classify government response under RTI Act 2005
+ */
+export async function classifyResponse(responseText, requestContext = {}) {
+  await delay();
+  const text = (responseText || '').toLowerCase();
+
+  let status = 'PARTIALLY_ANSWERED';
+  let sectionCited = null;
+  let reason = '';
+  let suggestedNextStep = 'Consider First Appeal';
+  let confidence = 'high';
+
+  if (text.includes('8(1)(j)') || text.includes('8 (1) (j)') || text.includes('personal information') || text.includes('privacy') || text.includes('third party')) {
+    status = 'DENIED';
+    sectionCited = '8(1)(j)';
+    reason = 'The authority denied disclosure invoking Section 8(1)(j), citing personal information or privacy of individuals without demonstrating larger public interest.';
+    suggestedNextStep = 'Consider First Appeal';
+  } else if (text.includes('8(1)(a)') || text.includes('security of india') || text.includes('sovereignty') || text.includes('strategic interest')) {
+    status = 'DENIED';
+    sectionCited = '8(1)(a)';
+    reason = 'The authority refused disclosure citing Section 8(1)(a) claiming potential prejudice to sovereignty, security, or strategic interests of the state.';
+    suggestedNextStep = 'Consider First Appeal';
+  } else if (text.includes('8(1)(d)') || text.includes('commercial confidence') || text.includes('trade secret') || text.includes('intellectual property')) {
+    status = 'DENIED';
+    sectionCited = '8(1)(d)';
+    reason = 'Information was withheld under Section 8(1)(d) citing commercial confidence or trade secrets of third parties.';
+    suggestedNextStep = 'Consider First Appeal';
+  } else if (text.includes('8(1)(e)') || text.includes('fiduciary')) {
+    status = 'DENIED';
+    sectionCited = '8(1)(e)';
+    reason = 'Disclosure was denied citing fiduciary relationship under Section 8(1)(e).';
+    suggestedNextStep = 'Consider First Appeal';
+  } else if (text.includes('8(1)(h)') || text.includes('investigation') || text.includes('prosecution') || text.includes('impede')) {
+    status = 'DENIED';
+    sectionCited = '8(1)(h)';
+    reason = 'Information was refused under Section 8(1)(h) on grounds that disclosure would impede ongoing investigation or prosecution of offenders.';
+    suggestedNextStep = 'Consider First Appeal';
+  } else if (text.includes('6(3)') || text.includes('transferred') || text.includes('forwarded') || text.includes('another public authority') || text.includes('does not pertain to this department')) {
+    status = 'TRANSFERRED';
+    sectionCited = 'Section 6(3)';
+    reason = 'Your application has been transferred under Section 6(3) to another public authority deemed to hold the requested records.';
+    suggestedNextStep = 'Request clarification';
+  } else if (text.includes('rejected') || text.includes('denied') || text.includes('cannot be provided') || text.includes('cannot be shared') || text.includes('not permissible') || text.includes('regret to inform')) {
+    status = 'DENIED';
+    sectionCited = null;
+    reason = 'The authority denied the requested information but cited no specific exemption section under Section 8(1) (no section cited in the reply).';
+    suggestedNextStep = 'Consider First Appeal';
+  } else if (text.includes('not compiled') || text.includes('bulky') || text.includes('disproportionate') || text.includes('create information') || text.includes('clarification') || text.includes('opinion') || text.includes('scattered')) {
+    status = 'EVASIVE_VAGUE';
+    sectionCited = null;
+    reason = 'The PIO gave an evasive or deflective reply stating records are not compiled or voluminous, without providing accessible documents.';
+    suggestedNextStep = 'Consider First Appeal';
+  } else if (text.includes('enclosed') || text.includes('attached') || text.includes('herewith') || text.includes('as requested') || text.includes('certified copy') || text.includes('furnished below') || text.includes('point wise information')) {
+    status = 'FULLY_ANSWERED';
+    sectionCited = null;
+    reason = 'The authority furnished substantive point-wise information and documents corresponding to the Section 6(1) queries.';
+    suggestedNextStep = 'No action needed';
+  } else {
+    status = 'PARTIALLY_ANSWERED';
+    sectionCited = null;
+    reason = 'The response provides preliminary or incomplete remarks regarding the requested matter; certain aspects remain unresolved.';
+    suggestedNextStep = 'Consider First Appeal';
+    confidence = 'medium';
+  }
+
+  return {
+    status,
+    sectionCited,
+    reason,
+    suggestedNextStep,
+    confidence,
+    disclaimer: 'AI-generated analysis. This is not legal advice — verify before deciding on an appeal.',
+  };
+}
+
+/**
+ * Save classification on mock case
+ */
+export async function saveResponseClassification(caseId, classificationData) {
+  await delay();
+  const index = casesStore.findIndex((c) => c.id === caseId);
+  if (index === -1) {
+    throw new Error(`Case ${caseId} not found`);
+  }
+
+  casesStore[index] = {
+    ...casesStore[index],
+    responseClassification: classificationData,
+    lastResponseStatus: classificationData.status,
+    pioResponseSummary: classificationData.reason,
+    pioResponseDate: new Date().toISOString(),
+    status: classificationData.status === 'DENIED' || classificationData.status === 'EVASIVE_VAGUE'
+      ? 'pio_replied'
+      : casesStore[index].status,
+    updatedAt: new Date().toISOString(),
+  };
+
+  return casesStore[index];
+}
+

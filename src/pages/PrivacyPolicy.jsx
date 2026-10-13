@@ -107,7 +107,7 @@ export const PrivacyPolicy = () => {
           <ul className="list-disc pl-5 space-y-1.5 text-[var(--foreground)] font-medium">
             <li><strong>Right to Erase:</strong> You can purge all stored local cases at any time from your dashboard or browser settings.</li>
             <li><strong>Right to Export:</strong> Download your drafted applications and appeal letters as text or PDF documents for your personal offline archives.</li>
-            <li><strong>Account Deletion:</strong> You may request complete account and data removal by contacting <a href="mailto:privacy@rtiassist.org" className="underline font-bold text-[var(--primary)]">privacy@rtiassist.org</a>.</li>
+            <li><strong>Account Deletion:</strong> You may request complete account and data removal by contacting <a href="mailto:darkpearl251103@gmail.com" className="underline font-bold text-[var(--primary)]">darkpearl251103@gmail.com</a>.</li>
           </ul>
         </section>
 
@@ -119,7 +119,7 @@ export const PrivacyPolicy = () => {
             For questions regarding this privacy policy or how your data is handled, please reach out to:
           </p>
           <p className="font-bold text-[var(--foreground)]">
-            Privacy & Civic Rights Team — <a href="mailto:privacy@rtiassist.org" className="text-[var(--primary)] underline">privacy@rtiassist.org</a>
+            Privacy & Civic Rights Team — <a href="mailto:darkpearl251103@gmail.com" className="text-[var(--primary)] underline">darkpearl251103@gmail.com</a>
           </p>
         </section>
       </div>
