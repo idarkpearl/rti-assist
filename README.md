@@ -1,121 +1,134 @@
-# 🏛️ RTI Assist
+# 🏛️ RTI Assist — Full-Stack Monorepo
 
-> **Empowering Indian citizens to draft, file, track, and appeal Right to Information (RTI) requests with AI assistance.**
+> **Empowering Indian citizens to draft, file, track, and appeal Right to Information (RTI) requests with AI assistance under the Right to Information Act, 2005.**
 
-RTI Assist simplifies the entire lifecycle of an RTI application under the Right to Information Act, 2005:
-$$\text{Citizen's Issue} \longrightarrow \text{AI Draft} \longrightarrow \text{Authority Recommendation} \longrightarrow \text{Official Filing} \longrightarrow \text{Statutory Deadline Tracking} \longrightarrow \text{First/Second Appeal}$$
-
----
-
-## 📄 Backend Handover Documentation & PDF
-For the backend developer building the Spring Boot + PostgreSQL service:
-- 📖 **Markdown Report**: [`BACKEND_HANDOVER_REPORT.md`](./BACKEND_HANDOVER_REPORT.md)
-- 📑 **Printable PDF**: [`BACKEND_HANDOVER_REPORT.pdf`](./BACKEND_HANDOVER_REPORT.pdf)
-
-Includes full API contracts, DTO schemas, database ER models, LLM system prompt specifications, statutory deadline rules, and Step 11 integration checklist.
+[![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.4.2-brightgreen.svg?logo=springboot)](https://spring.io/projects/spring-boot)
+[![React](https://img.shields.io/badge/React-19.0-blue.svg?logo=react)](https://react.dev)
+[![Java](https://img.shields.io/badge/Java-21%2F23-orange.svg?logo=openjdk)](https://openjdk.org)
+[![Gemini AI](https://img.shields.io/badge/Google_Gemini-3.1_Flash--Lite-purple.svg?logo=google)](https://aistudio.google.com)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ---
 
-## ✨ Features
+## 📌 Project Overview
 
-- **🪄 3-Step Guided Intake Wizard (`/intake`)**:
-  - Step 1: Plain-language citizen concern entry.
-  - Step 2: AI-structured formal RTI draft with editable queries and fee/inspection requests.
-  - Step 3: Verified Public Authority recommendation with jurisdiction, filing channels, and statutory disclaimers.
-- **📚 Verified Public Authority Directory (`/directory`)**:
-  - Searchable catalog of Central & Delhi NCT public authorities.
-  - Real PIO/CPIO designations, official filing portals, and direct linkage to request drafting.
-- **📝 Case Filing & Registration (`/cases/new/filing`)**:
-  - Official portal filing instructions (RTI Online / Delhi e-RTI).
-  - Capture registration number, filing date, confirmed authority, and document metadata.
-- **📊 Case Tracking Dashboard (`/dashboard`)**:
-  - Unified view of all citizen cases.
-  - Real-time statutory urgency badges:
-    - 🔴 **Red**: Urgent / Overdue (< 3 days left or passed).
-    - 🟡 **Yellow**: Attention needed (< 7 days left).
-    - 🟢 **Green**: Active / On track (≥ 7 days left).
-- **⏱️ Case Detail & Timeline (`/cases/:id`)**:
-  - Visual status progress: `Drafted` ➔ `Filed` ➔ `Response Due` ➔ `First Appeal` ➔ `Second Appeal` ➔ `Disposed`.
-  - Case metadata, authority contact info, and attached filing receipt records.
-  - Automatic appeal trigger when response deadline passes.
-- **⚖️ AI-Assisted Appeal Drafting (`/appeals/:id`)**:
-  - First Appeal (Section 19(1)) and Second Appeal (Section 19(3)) drafting.
-  - Grounds for appeal (No response within 30 days, incomplete/misleading information, unlawful refusal).
-  - One-click copy with filing instructions for FAA and CIC/SIC portals.
-- **🔐 Secure Authentication**:
-  - JWT-based authentication context (`AuthContext.tsx`).
-  - Protected routes for citizen dashboard, cases, and appeal management.
-  - Automatic `Authorization: Bearer <token>` injection for all secure API calls.
-- **🧪 Comprehensive Test Suite**:
-  - 30 unit tests covering statutory deadline calculations, edge cases, leap years, life & liberty requests, and JWT headers.
+**RTI Assist** simplifies and automates the entire lifecycle of citizen Right to Information applications:
+$$\text{Citizen Concern} \longrightarrow \text{AI Draft} \longrightarrow \text{Public Authority Recommendation} \longrightarrow \text{Portal Filing} \longrightarrow \text{Statutory Deadline Engine} \longrightarrow \text{First / Second Appeal}$$
+
+This monorepo contains the complete end-to-end software ecosystem:
+- **`rti-assist-frontend/`**: Modern React 19 + TypeScript + Tailwind CSS citizen portal with dark/light theme, interactive filing wizard, timeline dashboard, and appeal generator.
+- **`rti-assist-backend/`**: Enterprise-grade Java Spring Boot 3.4.2 REST backend powering authentication (Email OTP via Brevo + JWT), case management, statutory deadline engine, and Google Gemini AI gateway with resilient legal fallback.
+- **`rti-assist-llm-service/`**: Microservice providing RTI Act 2005 legal NLP classification for official government replies.
+- **`rti-assist-backend-node-backup/`**: Reference prototype Node.js backend.
 
 ---
 
-## 🛠️ Tech Stack
+## 🏗️ Repository Architecture
 
-- **Framework**: React 19 + TypeScript / JSX
-- **Styling**: Tailwind CSS
-- **Routing**: React Router v7
-- **Icons**: Lucide React
-- **Testing**: Vitest + Testing Library
-- **Build Tool**: Vite
-- **Target Backend**: Spring Boot 3.x + PostgreSQL 15/16 + Spring Security (JWT) + Claude / Gemini API
-
----
-
-## 🚀 Getting Started
-
-### 1. Clone & Install Dependencies
-```bash
-git clone https://github.com/idarkpearl/rti-assist.git
-cd rti-assist
-npm install
+```text
+rti-assist/
+├── rti-assist-frontend/            # React 19 + Vite + Tailwind CSS Citizen Web App
+│   ├── src/                        # Pages, components, hooks, tests
+│   ├── public/                     # Static assets & creator voice notes
+│   ├── package.json
+│   └── vite.config.js
+│
+├── rti-assist-backend/             # Java Spring Boot 3.4.2 REST Backend
+│   ├── src/main/java/              # Controllers, services, models, security
+│   ├── data/                       # Local JSON persistence store & seeds
+│   ├── pom.xml                     # Maven dependencies (Java 21/23)
+│   ├── mvnw.cmd / mvnw             # Maven wrapper scripts
+│   └── .env.example
+│
+├── rti-assist-llm-service/         # Dedicated LLM microservice
+│   ├── src/                        # Legal classification endpoints
+│   ├── package.json
+│   └── .env.example
+│
+├── .gitignore                      # Monorepo root ignore rules (excludes credentials & build artifacts)
+└── README.md                       # Monorepo documentation
 ```
 
-### 2. Environment Configuration
-Create a `.env` file based on `.env.example`:
+---
+
+## ⚡ Quickstart Guide
+
+### 1. Prerequisites
+- **Node.js**: v18+ or v20+ (`node -v`)
+- **Java**: Java 21 or Java 23 (`java -version`)
+- **Maven**: Maven Wrapper is pre-bundled in `rti-assist-backend`
+
+---
+
+### 2. Run the Java Spring Boot Backend
+
 ```bash
+cd rti-assist-backend
+
+# Configure your environment
 cp .env.example .env
+
+# Run using the included Maven wrapper (Windows PowerShell):
+.\mvnw.cmd spring-boot:run
+
+# Or on macOS/Linux:
+./mvnw spring-boot:run
 ```
 
-| Variable | Description | Default |
-| :--- | :--- | :--- |
-| `VITE_API_URL` | Base URL for Spring Boot backend | `http://localhost:8000/api` |
-| `VITE_USE_MOCK` | Toggle mock API (`true`) or real backend (`false`) | `true` |
+- **Backend Base URL**: `http://localhost:8000`
+- **REST API Base URL**: `http://localhost:8000/api`
+- **Health Check**: `http://localhost:8000/api/health`
 
-### 3. Run Development Server
+---
+
+### 3. Run the React Frontend
+
 ```bash
+cd rti-assist-frontend
+
+# Install dependencies
+npm install
+
+# Start development server
 npm run dev
 ```
-Open [http://localhost:5173](http://localhost:5173) in your browser.
 
-### 4. Run Test Suite
+- **Frontend Application**: `http://localhost:5173`
+
+> **Note on Mock Mode**: Set `VITE_USE_MOCK=false` in `rti-assist-frontend/.env` to connect directly to the live Java backend.
+
+---
+
+### 4. (Optional) Run the LLM Classification Service
+
 ```bash
-npm test
-```
-Runs all 30 Vitest tests validating deadline computations and authentication headers.
-
-### 5. Production Build
-```bash
-npm run build
+cd rti-assist-llm-service
+npm install
+npm run dev
 ```
 
----
-
-## 🏛️ Statutory Rules Implemented
-
-- **Section 7(1)**: General RTI response deadline is **30 calendar days** from filing date.
-- **Section 7(1) Proviso**: Requests concerning **Life and Liberty** require response within **48 hours**.
-- **Section 19(1)**: First Appeal must be filed within **30 days** after response deadline expiry.
-- **Section 19(3)**: Second Appeal must be filed within **90 days** from First Appellate decision date.
+- **Service URL**: `http://localhost:8001`
 
 ---
 
-## 🤝 Backend Handover Note
+## ⚖️ Statutory Deadline Rules (RTI Act, 2005)
 
-The frontend is complete and operates seamlessly with an in-memory mock mode (`VITE_USE_MOCK=true`). When the Spring Boot backend is deployed, simply switch `VITE_USE_MOCK=false` and configure `VITE_API_URL`. Refer to [`BACKEND_HANDOVER_REPORT.md`](./BACKEND_HANDOVER_REPORT.md) for full endpoint specifications.
+- **Section 7(1)**: General response deadline is **30 calendar days** from filing date.
+- **Section 7(1) Proviso**: Requests concerning **Life & Liberty** require response within **48 hours**.
+- **Section 19(1)**: First Appeal must be filed within **30 days** of deadline expiry or receipt of adverse decision.
+- **Section 19(3)**: Second Appeal to Central/State Information Commission within **90 days** from First Appellate decision.
 
 ---
 
-## 📜 License
-MIT
+## 🛡️ Zero-Crash AI Resiliency
+
+Both the backend and LLM service implement automatic legal rule-based fallbacks. If no external Gemini API key is configured or if rate limits are reached, the application automatically uses embedded statutory heuristics to draft queries, suggest authorities, and generate appeals without interrupting citizen workflow.
+
+---
+
+## 👨‍💻 Project Information
+
+Developed as part of the **B.Tech Semester 7 Project** at **Delhi Skill and Entrepreneurship University (DSEU)**.
+
+- **Developer**: Yash Sehgal ([@idarkpearl](https://github.com/idarkpearl))
+- **License**: MIT License

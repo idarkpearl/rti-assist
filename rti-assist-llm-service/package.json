@@ -1,0 +1,20 @@
+{
+  "name": "rti-assist-llm-service",
+  "version": "1.0.0",
+  "description": "RTI Assist Dedicated LLM Microservice (Node/Express + Google Gemini)",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "keywords": ["rti", "express", "gemini", "classification", "llm-service"],
+  "author": "RTI Assist Team",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "morgan": "^1.10.0"
+  }
+}

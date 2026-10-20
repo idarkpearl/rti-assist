@@ -1,0 +1,8 @@
+# LLM Service .gitignore
+node_modules/
+dist/
+.env
+*.local
+!.env.example
+logs/
+*.log

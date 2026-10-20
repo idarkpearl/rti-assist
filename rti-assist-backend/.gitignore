@@ -1,0 +1,11 @@
+# Spring Boot Backend .gitignore
+target/
+*.class
+.env
+*.local
+!.env.example
+.idea/
+*.iml
+.vscode/
+logs/
+*.log

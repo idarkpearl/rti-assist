@@ -1,0 +1,14 @@
+{
+  "name": "rti-assist-backend",
+  "version": "1.0.0",
+  "description": "RTI Assist Spring Boot Backend & Gemini AI Gateway",
+  "scripts": {
+    "start": "mvnw spring-boot:run",
+    "dev": "mvnw spring-boot:run",
+    "build": "mvnw clean package -DskipTests",
+    "test": "mvnw test"
+  },
+  "keywords": ["rti", "spring-boot", "java", "gemini", "ai", "legaltech"],
+  "author": "RTI Assist Team",
+  "license": "ISC"
+}
