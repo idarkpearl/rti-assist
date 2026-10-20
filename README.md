@@ -19,7 +19,6 @@ This monorepo contains the complete end-to-end software ecosystem:
 - **`rti-assist-frontend/`**: Modern React 19 + TypeScript + Tailwind CSS citizen portal with dark/light theme, interactive filing wizard, timeline dashboard, and appeal generator.
 - **`rti-assist-backend/`**: Enterprise-grade Java Spring Boot 3.4.2 REST backend powering authentication (Email OTP via Brevo + JWT), case management, statutory deadline engine, and Google Gemini AI gateway with resilient legal fallback.
 - **`rti-assist-llm-service/`**: Microservice providing RTI Act 2005 legal NLP classification for official government replies.
-- **`rti-assist-backend-node-backup/`**: Reference prototype Node.js backend.
 
 ---
 
@@ -126,9 +125,15 @@ Both the backend and LLM service implement automatic legal rule-based fallbacks.
 
 ---
 
-## 👨‍💻 Project Information
+## 👥 Project Team & Contributors
 
-Developed as part of the **B.Tech Semester 7 Project** at **Delhi Skill and Entrepreneurship University (DSEU)**.
+Developed as part of the **B.Tech Semester 7 Major Project** at **Delhi Skill and Entrepreneurship University (DSEU)**.
 
-- **Developer**: Yash Sehgal ([@idarkpearl](https://github.com/idarkpearl))
-- **License**: MIT License
+- **Yash Sehgal** ([@idarkpearl](https://github.com/idarkpearl)) — Project Lead & Full-Stack Engineer
+- **Prachi Mehra** ([@prachi1862](https://github.com/prachi1862)) — Partner, Collaborator & Systems Engineer
+
+---
+
+## 📜 License
+MIT License
+

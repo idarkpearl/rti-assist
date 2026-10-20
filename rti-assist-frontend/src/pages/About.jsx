@@ -438,13 +438,13 @@ export const About = () => {
           <div className="pt-5 flex flex-wrap items-center justify-between gap-3 text-xs">
             <div className="flex items-center gap-2">
               <a
-                href="https://github.com/prachi"
+                href="https://github.com/prachi1862"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-[var(--border)] rounded-md font-bold text-[var(--foreground)] hover:bg-[var(--muted)] transition"
               >
                 <GithubIcon className="w-3.5 h-3.5" />
-                <span>github.com/prachi</span>
+                <span>github.com/prachi1862</span>
                 <ExternalLink className="w-3 h-3 text-[var(--muted-foreground)]" />
               </a>
             </div>
