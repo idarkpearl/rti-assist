@@ -143,7 +143,7 @@ export const About = () => {
         ) : (
           <MascotPortfolioHero
             avatarPreset="prachi"
-            audioSrc="/audio/prach1.mp3"
+            audioSrc="/audio/prachi1.mp3"
             height="640px"
             minHeight="480px"
             index="DEV / 02"
@@ -161,7 +161,7 @@ export const About = () => {
             bracketed="JAVA"
             seekingLabel="Specialization"
             seeking="Spring Boot & Core CS"
-            href="https://github.com/prachi"
+            href="https://github.com/prachi1862"
             services={[
               "Java & Spring Boot",
               "Spring Security & OAuth2",

@@ -508,6 +508,18 @@ export default function MascotPortfolioHero({
           happyTimer.current = window.setTimeout(() => setHappy(false), 1000)
         }
         audio.onerror = () => {
+          // If first audio path fails, attempt fallback between prachi1 and prach1
+          if (isPrachi && customIntroAudio && !customIntroAudio.includes("prach1.mp3")) {
+            const fallback = new Audio("/audio/prach1.mp3")
+            audioRef.current = fallback
+            fallback.onended = () => {
+              window.clearTimeout(happyTimer.current)
+              happyTimer.current = window.setTimeout(() => setHappy(false), 1000)
+            }
+            fallback.onerror = () => playTTS(next)
+            fallback.play().catch(() => playTTS(next))
+            return
+          }
           // If custom audio file does not exist, fall back to browser TTS
           playTTS(next)
         }
