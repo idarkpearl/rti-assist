@@ -143,6 +143,7 @@ export const About = () => {
         ) : (
           <MascotPortfolioHero
             avatarPreset="prachi"
+            audioSrc="/audio/prach1.mp3"
             height="640px"
             minHeight="480px"
             index="DEV / 02"

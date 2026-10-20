@@ -57,6 +57,7 @@ desktop.ini
 *.tmp
 *.bak
 *.sw?
-yash1.mp3
+/yash1.mp3
+/prach1.mp3
 rti-assist-backend-node-backup/
 
