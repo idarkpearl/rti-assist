@@ -47,6 +47,15 @@ public class CaseController {
         return ResponseEntity.ok(list);
     }
 
+    @PostMapping("/verify-existing")
+    public ResponseEntity<Map<String, Object>> verifyExistingRti(
+            @RequestBody(required = false) Map<String, Object> body,
+            HttpServletRequest request
+    ) {
+        String userId = getUserId(request);
+        return ResponseEntity.ok(caseService.verifyExistingRti(body, userId));
+    }
+
     @PostMapping("/recommend-authority")
     public ResponseEntity<AuthorityRecommendationResponse> recommendAuthority(@RequestBody(required = false) Map<String, Object> body) {
         String draftText = "";

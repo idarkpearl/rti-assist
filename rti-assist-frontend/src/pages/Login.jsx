@@ -128,7 +128,11 @@ export const Login = () => {
       if (res.success) {
         setOtpStep('verify');
         setResendCooldown(60);
-        setSuccessMsg(`Verification code sent to ${email}. Please check your inbox!`);
+        if (res.sentViaBrevo === false && res.devOtp) {
+          setSuccessMsg(`Email delivery unavailable — use Dev OTP: ${res.devOtp}`);
+        } else {
+          setSuccessMsg(`Verification code sent to ${email}. Please check your inbox!`);
+        }
       } else {
         setError(res.message || 'Failed to dispatch verification code.');
       }

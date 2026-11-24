@@ -478,6 +478,70 @@ export const appealsApi = {
   generateFromCase: draftAppeal,
 };
 
+function localVerifyExistingRti(payload) {
+  const trackingNumber = String(payload?.trackingNumber || '').trim();
+  const filingDateStr = String(payload?.filingDate || '').trim();
+  const isLifeAndLiberty = Boolean(payload?.isLifeAndLiberty);
+
+  const formatValid =
+    /^[A-Za-z0-9][A-Za-z0-9/_-]{4,63}$/.test(trackingNumber) &&
+    (trackingNumber.includes('/') || trackingNumber.includes('-') || trackingNumber.length >= 6);
+
+  const filingMs = filingDateStr ? new Date(filingDateStr + 'T00:00:00Z').getTime() : Date.now();
+  const dateValid = !Number.isNaN(filingMs) && filingMs <= Date.now() + 86400000;
+
+  const allowedMs = (isLifeAndLiberty ? 2 : 30) * 86400000;
+  const dueMs = filingMs + allowedMs;
+  const daysRemaining = Math.ceil((dueMs - Date.now()) / 86400000);
+  const isOverdue = daysRemaining <= 0;
+
+  return {
+    valid: formatValid && dateValid,
+    status: formatValid && dateValid ? 'VERIFIED' : 'INVALID',
+    trackingNumber,
+    portalType: trackingNumber.toUpperCase().includes('/R/E/')
+      ? 'RTI Online (Central Govt Electronic Filing)'
+      : trackingNumber.toUpperCase().includes('/R/')
+        ? 'State / University RTI Portal (e.g., Delhi / Samarth / DSEU)'
+        : 'Central / State RTI Portal',
+    officialVerifyUrl: 'https://rtionline.gov.in/request/status.php',
+    dueDate: dateValid ? new Date(dueMs).toISOString() : null,
+    daysRemaining,
+    isOverdue,
+    recommendedStatus: isOverdue ? 'response_due' : 'submitted',
+    checks: [
+      {
+        name: 'Registration Number Format',
+        passed: formatValid,
+        detail: formatValid
+          ? `Matches standard RTI registration format (${trackingNumber})`
+          : 'Enter a valid RTI registration number (at least 5 characters, e.g. DSAEU/R/2026/60207)',
+      },
+      {
+        name: 'Filing Date & Statutory Window',
+        passed: dateValid,
+        detail: dateValid ? 'Valid filing date under RTI Act, 2005' : 'Filing date is invalid or in the future',
+      },
+    ],
+  };
+}
+
+export async function verifyExistingRti(payload) {
+  if (isMockEnabled) {
+    return localVerifyExistingRti(payload);
+  }
+  try {
+    return await api.post('/cases/verify-existing', payload);
+  } catch (err) {
+    if (err instanceof ApiError && (err.statusCode === 404 || err.statusCode === 500 || err.statusCode === 0)) {
+      return localVerifyExistingRti(payload);
+    }
+    throw err;
+  }
+}
+
+api.verifyExistingRti = verifyExistingRti;
+
 export async function sendOtp(email, name) {
   if (isMockEnabled) {
     return { success: true, message: 'Mock OTP sent', devOtp: '123456' };

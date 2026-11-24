@@ -11,6 +11,7 @@ import { AppealDraftDetail } from './pages/AppealDraftDetail.jsx';
 import { ResponseClassification } from './pages/ResponseClassification.jsx';
 import { Directory } from './pages/Directory.jsx';
 import { CaseFiling } from './pages/CaseFiling.jsx';
+import { AddExistingRti } from './pages/AddExistingRti.jsx';
 import { Login } from './pages/Login.jsx';
 import { About } from './pages/About.jsx';
 import { Contact } from './pages/Contact.jsx';
@@ -42,6 +43,7 @@ export function App() {
               <Route path="/intake" element={<Intake />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/cases/new/filing" element={<CaseFiling />} />
+              <Route path="/cases/add-existing" element={<AddExistingRti />} />
               <Route path="/cases/:id" element={<CaseDetail />} />
               <Route path="/cases/:id/response" element={<ResponseClassification />} />
               <Route path="/appeals/:id" element={<AppealDraftDetail />} />

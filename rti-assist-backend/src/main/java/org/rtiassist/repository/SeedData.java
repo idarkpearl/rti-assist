@@ -165,11 +165,11 @@ public class SeedData {
         a9.setLevel("state");
         a9.setJurisdiction("Delhi NCT");
         a9.setCategoryTags(Arrays.asList("DSEU", "College Funds", "Okhla Campus", "Polytechnic", "State University", "Campus Facilities", "Student Fees", "Technical Education"));
-        a9.setPortalUrl("https://dseu.ac.in/rti");
+        a9.setPortalUrl("https://dseu.ac.in/grievance-form");
         a9.setApplicationFee(10);
         a9.setPaymentModes(Arrays.asList("Online Portal (e-RTI Delhi)", "Postal Order", "Demand Draft"));
-        a9.setPio(new PioInfo("Dr. Ashwani Kumar", "Assistant Registrar & Designated PIO", "pio@dseu.ac.in", "+91-11-2530-1400", "DSEU Head Office / Okhla Campus-II, New Delhi - 110020"));
-        a9.setFirstAppellateAuthority(new FaaInfo("Prof. (Dr.) Ashok Kumar K.", "Registrar & First Appellate Authority (FAA)", "registrar@dseu.ac.in", "+91-11-2530-1401", "DSEU Head Office, Integrated Institute of Technology Complex, Sector-9, Dwarka, New Delhi - 110077"));
+        a9.setPio(new PioInfo("Ms. Bindu Nair", "CPIO", "rti@dseu.ac.in", "+91-11-2530-1400", "DSEU Head Office / Okhla Campus-II, New Delhi - 110020"));
+        a9.setFirstAppellateAuthority(new FaaInfo("Sh. Shailendra Singh Parihar, IAS", "First Appellate Authority (FAA)", "rti@dseu.ac.in", "+91-11-2530-1401", "DSEU Head Office, Integrated Institute of Technology Complex, Sector-9, Dwarka, New Delhi - 110077"));
         a9.setCreatedAt("2026-02-01T09:00:00Z");
         list.add(a9);
 

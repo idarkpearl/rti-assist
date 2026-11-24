@@ -233,11 +233,136 @@ public class CaseService {
                 ? "Emergency 48-hour deadline concerning life and liberty under Section 7(1) proviso."
                 : "Mandatory 30-day statutory response period from date of receipt by CPIO under Section 7(1).");
         defaultDl.setCreatedAt(filingDate);
+        refreshDynamicRemainingDays(defaultDl);
 
         deadlineRepository.save(new DeadlineEntity(defaultDl));
         data.setDeadlines(new ArrayList<>(Collections.singletonList(defaultDl)));
 
         return data;
+    }
+
+    /**
+     * Verifies an already-filed RTI application's registration number format,
+     * checks for duplicates in the user's account, and computes its statutory timeline.
+     */
+    public Map<String, Object> verifyExistingRti(Map<String, Object> payload, String userId) {
+        String effectiveUser = resolveUserId(userId);
+        String trackingNumber = payload != null && payload.get("trackingNumber") != null
+                ? String.valueOf(payload.get("trackingNumber")).trim()
+                : "";
+        String filingDateStr = payload != null && payload.get("filingDate") != null
+                ? String.valueOf(payload.get("filingDate")).trim()
+                : "";
+        String authorityId = payload != null && payload.get("authorityId") != null
+                ? String.valueOf(payload.get("authorityId")).trim()
+                : "";
+        boolean isLifeAndLiberty = payload != null && Boolean.TRUE.equals(payload.get("isLifeAndLiberty"));
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        List<Map<String, Object>> checks = new ArrayList<>();
+
+        // 1. Format validation (Indian RTI registration patterns: e.g. DSAEU/R/2026/60207, DOEAF/R/E/24/01234, RTI-2026-...)
+        boolean formatValid = trackingNumber.matches("^[A-Za-z0-9][A-Za-z0-9/_-]{4,63}$")
+                && (trackingNumber.contains("/") || trackingNumber.contains("-") || trackingNumber.length() >= 6);
+        checks.add(Map.of(
+                "name", "Registration Number Format",
+                "passed", formatValid,
+                "detail", formatValid
+                        ? "Matches standard RTI registration / acknowledgment format (" + trackingNumber + ")"
+                        : "Enter a valid RTI registration number (at least 5 characters, e.g. DSAEU/R/2026/60207 or RTI-2026-1001)"
+        ));
+
+        // 2. Duplicate check in user's account
+        boolean isDuplicate = false;
+        String duplicateCaseId = null;
+        if (!trackingNumber.isBlank()) {
+            for (CaseEntity c : caseRepository.findByUserId(effectiveUser)) {
+                if (c.getTrackingNumber() != null && c.getTrackingNumber().trim().equalsIgnoreCase(trackingNumber)) {
+                    isDuplicate = true;
+                    duplicateCaseId = c.getId();
+                    break;
+                }
+            }
+        }
+        checks.add(Map.of(
+                "name", "Account Duplicate Check",
+                "passed", !isDuplicate,
+                "detail", isDuplicate
+                        ? "This registration number is already tracked in your account (Case ID: " + duplicateCaseId + ")"
+                        : "No duplicate RTI found in your account"
+        ));
+
+        // 3. Filing date & statutory deadline calculation
+        Instant filingInstant = null;
+        boolean dateValid = true;
+        if (!filingDateStr.isBlank()) {
+            try {
+                if (filingDateStr.length() == 10) {
+                    filingInstant = Instant.parse(filingDateStr + "T00:00:00Z");
+                } else {
+                    filingInstant = Instant.parse(filingDateStr);
+                }
+            } catch (Exception e) {
+                dateValid = false;
+            }
+        } else {
+            filingInstant = Instant.now();
+        }
+        if (filingInstant != null && filingInstant.isAfter(Instant.now().plus(1, ChronoUnit.DAYS))) {
+            dateValid = false;
+        }
+        checks.add(Map.of(
+                "name", "Filing Date & Statutory Window",
+                "passed", dateValid,
+                "detail", dateValid
+                        ? "Valid filing date under RTI Act, 2005"
+                        : "Filing date is invalid or cannot be in the future"
+        ));
+
+        // Portal type inference
+        String portalType = "Central / State RTI Portal";
+        if (trackingNumber.toUpperCase().contains("/R/E/")) {
+            portalType = "RTI Online (Central Govt Electronic Filing)";
+        } else if (trackingNumber.toUpperCase().contains("/R/")) {
+            portalType = "State / University RTI Portal (e.g., Delhi / Samarth / DSEU)";
+        } else if (trackingNumber.toUpperCase().startsWith("RTI-")) {
+            portalType = "RTI Assist / Manual Portal Reference";
+        }
+
+        String officialVerifyUrl = "https://rtionline.gov.in/request/status.php";
+        if (!authorityId.isBlank()) {
+            Authority auth = authorityRepository.findById(authorityId).map(AuthorityEntity::toModel).orElse(null);
+            if (auth != null && auth.getPortalUrl() != null && !auth.getPortalUrl().isBlank()) {
+                officialVerifyUrl = auth.getPortalUrl();
+            }
+        }
+
+        int daysRemaining = isLifeAndLiberty ? 2 : 30;
+        String dueDate = null;
+        boolean isOverdue = false;
+        if (filingInstant != null && dateValid) {
+            Instant dueInstant = isLifeAndLiberty
+                    ? filingInstant.plus(48, ChronoUnit.HOURS)
+                    : filingInstant.plus(30, ChronoUnit.DAYS);
+            dueDate = dueInstant.toString();
+            long seconds = Duration.between(Instant.now(), dueInstant).getSeconds();
+            daysRemaining = (int) Math.ceil(seconds / 86400.0);
+            isOverdue = daysRemaining <= 0;
+        }
+
+        boolean valid = formatValid && !isDuplicate && dateValid;
+        result.put("valid", valid);
+        result.put("status", isDuplicate ? "DUPLICATE" : (valid ? "VERIFIED" : "INVALID"));
+        result.put("trackingNumber", trackingNumber);
+        result.put("portalType", portalType);
+        result.put("officialVerifyUrl", officialVerifyUrl);
+        result.put("dueDate", dueDate);
+        result.put("daysRemaining", daysRemaining);
+        result.put("isOverdue", isOverdue);
+        result.put("recommendedStatus", isOverdue ? "response_due" : "submitted");
+        result.put("duplicateCaseId", duplicateCaseId);
+        result.put("checks", checks);
+        return result;
     }
 
     /**

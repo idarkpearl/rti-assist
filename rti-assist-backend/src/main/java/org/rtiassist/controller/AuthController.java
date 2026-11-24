@@ -55,9 +55,13 @@ public class AuthController {
                 .map(UserEntity::toModel)
                 .orElse(null);
 
+        boolean hasUsablePassword = user != null
+                && Boolean.TRUE.equals(user.getHasPassword())
+                && user.getPassword() != null
+                && !user.getPassword().isBlank();
         CheckEmailResponse resp = new CheckEmailResponse(
                 user != null,
-                user != null && Boolean.TRUE.equals(user.getHasPassword()),
+                hasUsablePassword,
                 user != null ? user.getName() : null
         );
         return ResponseEntity.ok(resp);
@@ -102,7 +106,9 @@ public class AuthController {
         }
 
         String token = jwtUtil.generateToken(user);
-        boolean requiresPasswordSetup = !Boolean.TRUE.equals(user.getHasPassword());
+        boolean requiresPasswordSetup = !Boolean.TRUE.equals(user.getHasPassword())
+                || user.getPassword() == null
+                || user.getPassword().isBlank();
 
         AuthResponse resp = new AuthResponse();
         resp.setSuccess(true);
@@ -168,7 +174,9 @@ public class AuthController {
             throw new ApiException(HttpStatus.NOT_FOUND, "USER_NOT_FOUND", "No account found with this email. Please verify with OTP to create your account.");
         }
 
-        if (!Boolean.TRUE.equals(userEntity.getHasPassword())) {
+        if (!Boolean.TRUE.equals(userEntity.getHasPassword())
+                || userEntity.getPassword() == null
+                || userEntity.getPassword().isBlank()) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "PASSWORD_NOT_SET", "You have not created a password yet. Please sign in via Email OTP to set your password.");
         }
 

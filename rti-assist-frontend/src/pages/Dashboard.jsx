@@ -284,6 +284,14 @@ export const Dashboard = () => {
           </button>
 
           <Link
+            to="/cases/add-existing"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-slate-800 bg-white border-2 border-slate-200 hover:border-emerald-400 hover:text-emerald-700 shadow-sm active:scale-95 transition-all cursor-pointer"
+          >
+            <FileCheck2 className="w-4 h-4 text-emerald-600" />
+            <span>Add Already-Filed RTI</span>
+          </Link>
+
+          <Link
             to="/intake"
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-sm active:scale-95 transition-all cursor-pointer"
           >
