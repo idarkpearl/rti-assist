@@ -4,27 +4,30 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.rtiassist.config.DotenvConfig;
 import org.rtiassist.dto.*;
 import org.rtiassist.exception.ApiException;
-import org.rtiassist.model.CaseItem;
-import org.rtiassist.model.User;
-import org.rtiassist.repository.JsonDataStore;
+import org.rtiassist.model.Authority;
+import org.rtiassist.service.AuthorityService;
+import org.rtiassist.service.CaseService;
 import org.rtiassist.service.GeminiService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
 public class AiController {
 
     private final GeminiService geminiService;
-    private final JsonDataStore dataStore;
+    private final CaseService caseService;
+    private final AuthorityService authorityService;
     private final DotenvConfig dotenvConfig;
 
-    public AiController(GeminiService geminiService, JsonDataStore dataStore, DotenvConfig dotenvConfig) {
+    public AiController(GeminiService geminiService, CaseService caseService, AuthorityService authorityService, DotenvConfig dotenvConfig) {
         this.geminiService = geminiService;
-        this.dataStore = dataStore;
+        this.caseService = caseService;
+        this.authorityService = authorityService;
         this.dotenvConfig = dotenvConfig;
     }
 
@@ -74,13 +77,16 @@ public class AiController {
         Object caseDetails = (body != null) ? body.get("caseDetails") : null;
 
         if (caseDetails == null && caseId != null) {
-            caseDetails = dataStore.getCaseById(caseId);
+            caseDetails = caseService.getCaseById(caseId, null);
         }
 
         if (caseDetails == null) {
             Map<String, Object> defaultDetails = new LinkedHashMap<>();
             defaultDetails.put("trackingNumber", caseId != null ? caseId : "RTI-2026-0042");
-            defaultDetails.put("authority", dataStore.getAuthorities(null, null, null).get(0));
+            List<Authority> authorities = authorityService.getAuthorities(null, null, null);
+            if (!authorities.isEmpty()) {
+                defaultDetails.put("authority", authorities.get(0));
+            }
             defaultDetails.put("filingDate", java.time.Instant.now().toString());
             caseDetails = defaultDetails;
         }

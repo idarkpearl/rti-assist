@@ -1,6 +1,7 @@
 package org.rtiassist.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.rtiassist.dto.ClassificationResult;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +29,8 @@ public class CaseItem {
     private List<String> tags = new ArrayList<>();
     private String pioResponseSummary;
     private String pioResponseDate;
+    private String lastResponseStatus;
+    private ClassificationResult responseClassification;
     private String createdAt;
     private String updatedAt;
 
@@ -98,6 +101,12 @@ public class CaseItem {
 
     public String getPioResponseDate() { return pioResponseDate; }
     public void setPioResponseDate(String pioResponseDate) { this.pioResponseDate = pioResponseDate; }
+
+    public String getLastResponseStatus() { return lastResponseStatus; }
+    public void setLastResponseStatus(String lastResponseStatus) { this.lastResponseStatus = lastResponseStatus; }
+
+    public ClassificationResult getResponseClassification() { return responseClassification; }
+    public void setResponseClassification(ClassificationResult responseClassification) { this.responseClassification = responseClassification; }
 
     public String getCreatedAt() { return createdAt; }
     public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }

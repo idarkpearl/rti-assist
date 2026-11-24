@@ -21,7 +21,7 @@ import {
   Calendar,
   Sparkles,
 } from 'lucide-react';
-import { api } from '../lib/api.js';
+import { api, isMockEnabled } from '../lib/api.js';
 import { useCaseStore } from '../lib/store.js';
 import { formatDeadline } from '../lib/deadlineUtils';
 
@@ -173,14 +173,17 @@ export const Dashboard = () => {
     try {
       const data = await api.listCases();
       if (Array.isArray(data)) {
-        const idMap = new Map();
-        storedCases.forEach((c) => idMap.set(c.id, c));
-        data.forEach((c) => {
-          if (!idMap.has(c.id)) {
-            idMap.set(c.id, c);
-          }
-        });
-        setCases(Array.from(idMap.values()));
+        if (!isMockEnabled) {
+          // Database is source of truth when connected to backend
+          setCases(data);
+        } else {
+          const idMap = new Map();
+          data.forEach((c) => idMap.set(c.id, c));
+          storedCases.forEach((c) => {
+            if (!idMap.has(c.id)) idMap.set(c.id, c);
+          });
+          setCases(Array.from(idMap.values()));
+        }
       } else {
         setCases(storedCases);
       }

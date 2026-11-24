@@ -33,6 +33,27 @@ public class DotenvConfig {
         // Set server.port from .env if present
         String port = get("PORT", "8000");
         System.setProperty("server.port", port);
+
+        // Export DB_URL, DB_USER, DB_PASSWORD, DB_DRIVER environment placeholders for application.properties
+        String dbUrl = get("DB_URL", null);
+        if (dbUrl != null && !dbUrl.isBlank() && System.getProperty("DB_URL") == null) {
+            System.setProperty("DB_URL", dbUrl);
+            if (dbUrl.startsWith("jdbc:postgresql:") && get("DB_DRIVER", null) == null && System.getProperty("DB_DRIVER") == null) {
+                System.setProperty("DB_DRIVER", "org.postgresql.Driver");
+            }
+        }
+        String dbDriver = get("DB_DRIVER", null);
+        if (dbDriver != null && !dbDriver.isBlank() && System.getProperty("DB_DRIVER") == null) {
+            System.setProperty("DB_DRIVER", dbDriver);
+        }
+        String dbUser = get("DB_USER", null);
+        if (dbUser != null && !dbUser.isBlank() && System.getProperty("DB_USER") == null) {
+            System.setProperty("DB_USER", dbUser);
+        }
+        String dbPass = get("DB_PASSWORD", null);
+        if (dbPass != null && !dbPass.isBlank() && System.getProperty("DB_PASSWORD") == null) {
+            System.setProperty("DB_PASSWORD", dbPass);
+        }
     }
 
     public static String get(String key, String defaultValue) {
@@ -87,5 +108,39 @@ public class DotenvConfig {
 
     public String getBrevoSenderName() {
         return get("BREVO_SENDER_NAME", "RTI Assist Verification");
+    }
+
+    public String getDbUrl() {
+        return get("DB_URL", "jdbc:h2:file:./data/rti_assist_db;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH");
+    }
+
+    public String getDbDriver() {
+        String driver = get("DB_DRIVER", "");
+        if (!driver.isBlank()) return driver;
+        return getDbUrl().startsWith("jdbc:postgresql:") ? "org.postgresql.Driver" : "org.h2.Driver";
+    }
+
+    public String getDbUser() {
+        return get("DB_USER", "postgres");
+    }
+
+    public String getDbPassword() {
+        return get("DB_PASSWORD", "postgres");
+    }
+
+    public boolean isAppDevMode() {
+        return "true".equalsIgnoreCase(get("APP_DEV_MODE", "true"));
+    }
+
+    public String getReminderCron() {
+        return get("REMINDER_CRON", "0 0 9 * * ?");
+    }
+
+    public String getUploadDir() {
+        return get("UPLOAD_DIR", "uploads");
+    }
+
+    public boolean isOcrEnabled() {
+        return "true".equalsIgnoreCase(get("OCR_ENABLED", "false"));
     }
 }

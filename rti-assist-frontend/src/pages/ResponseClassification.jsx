@@ -130,9 +130,7 @@ export const ResponseClassification = () => {
         lastResponseStatus: classification.status,
         pioResponseSummary: classification.reason,
         pioResponseDate: new Date().toISOString(),
-        status: classification.status === 'DENIED' || classification.status === 'EVASIVE_VAGUE'
-          ? 'pio_replied'
-          : caseItem?.status || 'pio_replied',
+        status: classification.status === 'TRANSFERRED' ? 'transferred' : 'pio_replied',
       });
 
       setSaveSuccess(true);

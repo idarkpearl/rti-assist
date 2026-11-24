@@ -265,18 +265,33 @@ export const CaseDetail = () => {
     navigate(`/appeals/${appealId}`);
   };
 
-  // Handle logging PIO response
-  const handleRecordPioResponse = () => {
+  // Handle logging PIO response (persisted to database)
+  const handleRecordPioResponse = async () => {
     if (!responseSummary.trim()) return;
-    const updated = {
-      ...caseItem,
-      status: 'pio_replied',
-      pioResponseSummary: responseSummary.trim(),
-      pioResponseDate: new Date().toISOString(),
-    };
-    setCaseItem(updated);
-    updateStoreCase(caseItem.id, updated);
-    setResponseModalOpen(false);
+    const summaryText = responseSummary.trim();
+    const responseDate = new Date().toISOString();
+    try {
+      const updated = await api.updateCase(caseItem.id, {
+        status: 'pio_replied',
+        pioResponseSummary: summaryText,
+        pioResponseDate: responseDate,
+      });
+      setCaseItem(updated);
+      setSelectedStatus(updated.status || 'pio_replied');
+      updateStoreCase(caseItem.id, updated);
+    } catch (err) {
+      console.error('Failed to persist PIO response to database', err);
+      const fallback = {
+        ...caseItem,
+        status: 'pio_replied',
+        pioResponseSummary: summaryText,
+        pioResponseDate: responseDate,
+      };
+      setCaseItem(fallback);
+      updateStoreCase(caseItem.id, fallback);
+    } finally {
+      setResponseModalOpen(false);
+    }
   };
 
   const currentStageIdx = getCurrentStageIndex(caseItem.status, caseItem.appeals?.length);
@@ -413,6 +428,15 @@ export const CaseDetail = () => {
                 <Scale className="w-3.5 h-3.5" />
                 <span>Classify Govt Response</span>
               </Link>
+
+              <button
+                onClick={() => api.downloadCasePdf(caseItem.id, caseItem.trackingNumber)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 border-2 border-slate-300 transition shadow-xs cursor-pointer"
+                title="Download Formal RTI Application PDF"
+              >
+                <FileDown className="w-3.5 h-3.5" />
+                <span>Download PDF</span>
+              </button>
 
               <button
                 onClick={() => setResponseModalOpen(true)}
@@ -774,9 +798,21 @@ export const CaseDetail = () => {
                         </p>
                       </div>
                     </div>
-                    <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200 shrink-0">
-                      Verified Receipt
-                    </span>
+                    <div className="flex items-center gap-2 shrink-0">
+                      {doc.fileUrl && doc.fileUrl.startsWith('/api/') && (
+                        <a
+                          href={`${api.getBaseUrl().replace(/\/api$/, '')}${doc.fileUrl}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[11px] font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded-md border border-blue-200 transition"
+                        >
+                          Download
+                        </a>
+                      )}
+                      <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
+                        Verified Receipt
+                      </span>
+                    </div>
                   </div>
                 ))}
               </div>

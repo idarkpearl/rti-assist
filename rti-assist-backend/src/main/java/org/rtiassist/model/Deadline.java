@@ -15,6 +15,7 @@ public class Deadline {
     private Boolean isLifeAndLiberty = false;
     private String actSectionReference = "RTI Act Sec 7(1)";
     private String notes;
+    private Boolean reminderSent = false;
     private String createdAt;
     private String completedAt;
     private String updatedAt;
@@ -53,6 +54,9 @@ public class Deadline {
 
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }
+
+    public Boolean getReminderSent() { return reminderSent; }
+    public void setReminderSent(Boolean reminderSent) { this.reminderSent = reminderSent; }
 
     public String getCreatedAt() { return createdAt; }
     public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }

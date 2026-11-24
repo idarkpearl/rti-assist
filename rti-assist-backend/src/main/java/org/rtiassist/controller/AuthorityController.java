@@ -2,7 +2,7 @@ package org.rtiassist.controller;
 
 import org.rtiassist.exception.ApiException;
 import org.rtiassist.model.Authority;
-import org.rtiassist.repository.JsonDataStore;
+import org.rtiassist.service.AuthorityService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,10 +13,10 @@ import java.util.List;
 @RequestMapping("/api/authorities")
 public class AuthorityController {
 
-    private final JsonDataStore dataStore;
+    private final AuthorityService authorityService;
 
-    public AuthorityController(JsonDataStore dataStore) {
-        this.dataStore = dataStore;
+    public AuthorityController(AuthorityService authorityService) {
+        this.authorityService = authorityService;
     }
 
     @GetMapping
@@ -25,13 +25,13 @@ public class AuthorityController {
             @RequestParam(required = false) String jurisdiction,
             @RequestParam(required = false) String level
     ) {
-        List<Authority> list = dataStore.getAuthorities(search, jurisdiction, level);
+        List<Authority> list = authorityService.getAuthorities(search, jurisdiction, level);
         return ResponseEntity.ok(list);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Authority> getAuthority(@PathVariable String id) {
-        Authority auth = dataStore.getAuthorityById(id);
+        Authority auth = authorityService.getAuthorityById(id);
         if (auth == null) {
             throw new ApiException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Authority not found with id: " + id);
         }

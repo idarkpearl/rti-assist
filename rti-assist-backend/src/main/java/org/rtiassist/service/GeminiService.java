@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.rtiassist.config.DotenvConfig;
 import org.rtiassist.dto.*;
 import org.rtiassist.model.Authority;
-import org.rtiassist.repository.JsonDataStore;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
@@ -19,7 +18,7 @@ import java.util.*;
 public class GeminiService {
 
     private final DotenvConfig dotenvConfig;
-    private final JsonDataStore dataStore;
+    private final AuthorityService authorityService;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final HttpClient httpClient = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(15))
@@ -37,9 +36,9 @@ public class GeminiService {
             "Request clarification"
     );
 
-    public GeminiService(DotenvConfig dotenvConfig, JsonDataStore dataStore) {
+    public GeminiService(DotenvConfig dotenvConfig, AuthorityService authorityService) {
         this.dotenvConfig = dotenvConfig;
-        this.dataStore = dataStore;
+        this.authorityService = authorityService;
     }
 
     public boolean isConfigured() {
@@ -172,7 +171,7 @@ public class GeminiService {
      */
     public AuthorityRecommendationResponse recommendAuthority(String draftText) {
         String text = (draftText != null) ? draftText.toLowerCase() : "";
-        List<Authority> authorities = dataStore.getAuthorities(null, null, null);
+        List<Authority> authorities = authorityService.getAuthorities(null, null, null);
 
         Authority selected = authorities.stream().filter(a -> "auth-9".equals(a.getId())).findFirst().orElse(
                 !authorities.isEmpty() ? authorities.get(0) : null

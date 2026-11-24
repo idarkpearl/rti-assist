@@ -364,10 +364,57 @@ export async function saveResponseClassification(caseId, classificationData) {
     lastResponseStatus: classificationData.status,
     pioResponseSummary: classificationData.reason,
     pioResponseDate: new Date().toISOString(),
-    status: classificationData.status === 'DENIED' || classificationData.status === 'EVASIVE_VAGUE'
-      ? 'pio_replied'
-      : undefined,
+    status: classificationData.status === 'TRANSFERRED' ? 'transferred' : 'pio_replied',
   });
+}
+
+export async function uploadCaseDocument(caseId, file, category = 'attachment') {
+  if (isMockEnabled) {
+    return {
+      document: {
+        id: `doc-${Date.now()}`,
+        caseId,
+        fileName: file.name,
+        fileSize: file.size,
+        mimeType: file.type || 'application/octet-stream',
+        fileUrl: '#',
+        category,
+        uploadedAt: new Date().toISOString(),
+      },
+    };
+  }
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('category', category);
+  const token = getAuthToken();
+  const res = await fetch(`${BASE_URL}/cases/${caseId}/documents`, {
+    method: 'POST',
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    body: formData,
+  });
+  if (!res.ok) {
+    throw new ApiError(res.status, `Failed to upload document (${res.status})`, 'UPLOAD_FAILED');
+  }
+  return res.json();
+}
+
+export async function downloadCasePdf(caseId, trackingNumber) {
+  const token = getAuthToken();
+  const res = await fetch(`${BASE_URL}/cases/${caseId}/pdf`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  if (!res.ok) {
+    throw new ApiError(res.status, 'Failed to download RTI PDF', 'PDF_DOWNLOAD_FAILED');
+  }
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${(trackingNumber || caseId).replace(/[^a-zA-Z0-9._-]/g, '_')}.pdf`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 // Attach helpers directly on api object so api.draftRequest(...) and api.recommendAuthority(...) can be called
@@ -375,6 +422,8 @@ api.draftRequest = draftRequest;
 api.recommendAuthority = recommendAuthority;
 api.classifyResponse = classifyResponse;
 api.saveResponseClassification = saveResponseClassification;
+api.uploadCaseDocument = uploadCaseDocument;
+api.downloadCasePdf = downloadCasePdf;
 api.getAuthorities = getAuthorities;
 api.createCase = createCase;
 api.getCase = getCase;

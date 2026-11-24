@@ -2,27 +2,31 @@ package org.rtiassist.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.rtiassist.config.JwtUtil;
+import org.rtiassist.config.PasswordUtil;
 import org.rtiassist.dto.*;
+import org.rtiassist.entity.UserEntity;
 import org.rtiassist.exception.ApiException;
 import org.rtiassist.model.User;
-import org.rtiassist.repository.JsonDataStore;
+import org.rtiassist.repository.UserRepository;
 import org.rtiassist.service.BrevoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private final JsonDataStore dataStore;
+    private final UserRepository userRepository;
     private final BrevoService brevoService;
     private final JwtUtil jwtUtil;
 
-    public AuthController(JsonDataStore dataStore, BrevoService brevoService, JwtUtil jwtUtil) {
-        this.dataStore = dataStore;
+    public AuthController(UserRepository userRepository, BrevoService brevoService, JwtUtil jwtUtil) {
+        this.userRepository = userRepository;
         this.brevoService = brevoService;
         this.jwtUtil = jwtUtil;
     }
@@ -47,7 +51,10 @@ public class AuthController {
             throw new ApiException(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Email is required");
         }
 
-        User user = dataStore.findUserByEmail(req.getEmail());
+        User user = userRepository.findByEmailIgnoreCase(req.getEmail().trim())
+                .map(UserEntity::toModel)
+                .orElse(null);
+
         CheckEmailResponse resp = new CheckEmailResponse(
                 user != null,
                 user != null && Boolean.TRUE.equals(user.getHasPassword()),
@@ -68,7 +75,9 @@ public class AuthController {
         }
 
         // Find or auto-create citizen account
-        User user = dataStore.findUserByEmail(req.getEmail());
+        User user = userRepository.findByEmailIgnoreCase(req.getEmail().trim())
+                .map(UserEntity::toModel)
+                .orElse(null);
         boolean isNewUser = false;
         if (user == null) {
             isNewUser = true;
@@ -78,12 +87,18 @@ public class AuthController {
             String formattedName = namePart.substring(0, 1).toUpperCase() + (namePart.length() > 1 ? namePart.substring(1) : "");
 
             user = new User();
-            user.setEmail(req.getEmail());
+            user.setId("usr-" + System.currentTimeMillis());
+            user.setEmail(req.getEmail().trim().toLowerCase());
             user.setName(formattedName.isBlank() ? "Citizen User" : formattedName);
             user.setRole("citizen");
             user.setPassword("");
             user.setHasPassword(false);
-            user = dataStore.createUser(user);
+            user.setEmailVerified(true);
+            user.setCreatedAt(Instant.now().toString());
+            user.setUpdatedAt(Instant.now().toString());
+
+            UserEntity saved = userRepository.save(new UserEntity(user));
+            user = saved.toModel();
         }
 
         String token = jwtUtil.generateToken(user);
@@ -120,10 +135,18 @@ public class AuthController {
             throw new ApiException(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Password must be at least 6 characters long.");
         }
 
-        User updatedUser = dataStore.updateUserPassword(userEmail, req.getPassword());
-        if (updatedUser == null) {
+        Optional<UserEntity> opt = userRepository.findByEmailIgnoreCase(userEmail.trim());
+        if (opt.isEmpty()) {
             throw new ApiException(HttpStatus.NOT_FOUND, "USER_NOT_FOUND", "User account not found. Please verify your email first.");
         }
+
+        UserEntity ue = opt.get();
+        ue.setPassword(PasswordUtil.hash(req.getPassword()));
+        ue.setHasPassword(true);
+        ue.setEmailVerified(true);
+        ue.setUpdatedAt(Instant.now().toString());
+        userRepository.save(ue);
+        User updatedUser = ue.toModel();
 
         System.out.println("[Auth] 🔑 Password created for user: " + userEmail);
 
@@ -140,19 +163,27 @@ public class AuthController {
             throw new ApiException(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Both email and password are required.");
         }
 
-        User user = dataStore.findUserByEmail(req.getEmail());
-        if (user == null) {
+        UserEntity userEntity = userRepository.findByEmailIgnoreCase(req.getEmail().trim()).orElse(null);
+        if (userEntity == null) {
             throw new ApiException(HttpStatus.NOT_FOUND, "USER_NOT_FOUND", "No account found with this email. Please verify with OTP to create your account.");
         }
 
-        if (!Boolean.TRUE.equals(user.getHasPassword())) {
+        if (!Boolean.TRUE.equals(userEntity.getHasPassword())) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "PASSWORD_NOT_SET", "You have not created a password yet. Please sign in via Email OTP to set your password.");
         }
 
-        if (!req.getPassword().equals(user.getPassword())) {
+        if (!PasswordUtil.matches(req.getPassword(), userEntity.getPassword())) {
             throw new ApiException(HttpStatus.UNAUTHORIZED, "INVALID_CREDENTIALS", "Incorrect password. Please try again or sign in with Email OTP.");
         }
 
+        // Upgrade legacy plaintext password to PBKDF2 hash transparently
+        if (!PasswordUtil.isHashed(userEntity.getPassword())) {
+            userEntity.setPassword(PasswordUtil.hash(req.getPassword()));
+            userEntity.setUpdatedAt(Instant.now().toString());
+            userRepository.save(userEntity);
+        }
+
+        User user = userEntity.toModel();
         String token = jwtUtil.generateToken(user);
 
         AuthResponse resp = new AuthResponse();
@@ -170,7 +201,9 @@ public class AuthController {
             throw new ApiException(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", "Authentication token is required");
         }
 
-        User persisted = dataStore.findUserByEmail(authUser.getEmail());
-        return ResponseEntity.ok(Map.of("user", persisted != null ? persisted : authUser));
+        User persisted = userRepository.findByEmailIgnoreCase(authUser.getEmail().trim())
+                .map(UserEntity::toModel)
+                .orElse(authUser);
+        return ResponseEntity.ok(Map.of("user", persisted));
     }
 }

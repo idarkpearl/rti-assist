@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.*;
@@ -16,6 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@org.springframework.test.context.ActiveProfiles("test")
 class RtiAssistBackendApplicationTests {
 
     @Autowired
@@ -169,5 +171,65 @@ class RtiAssistBackendApplicationTests {
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.user.email").value(testEmail));
+    }
+
+    @Test
+    void testResponseClassificationPersistenceDocumentUploadAndPdfExport() throws Exception {
+        CaseItem newCase = new CaseItem();
+        newCase.setTitle("Water Pipeline Audit");
+        newCase.setSubjectCategory("Water Supply");
+        newCase.setAuthorityId("auth-7");
+
+        String createBody = mockMvc.perform(post("/api/cases")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newCase)))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+
+        CaseItem created = objectMapper.readValue(createBody, CaseItem.class);
+
+        // Persist responseClassification via PATCH
+        String patchPayload = """
+                {
+                  "status": "pio_replied",
+                  "lastResponseStatus": "DENIED",
+                  "pioResponseSummary": "Denied under Sec 8(1)(j)",
+                  "responseClassification": {
+                    "status": "DENIED",
+                    "sectionCited": "8(1)(j)",
+                    "reason": "Third-party personal privacy invoked.",
+                    "suggestedNextStep": "Consider First Appeal",
+                    "confidence": "high"
+                  }
+                }
+                """;
+
+        mockMvc.perform(patch("/api/cases/" + created.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(patchPayload))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.lastResponseStatus").value("DENIED"))
+                .andExpect(jsonPath("$.responseClassification.sectionCited").value("8(1)(j)"));
+
+        // Verify persisted on GET
+        mockMvc.perform(get("/api/cases/" + created.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.responseClassification.status").value("DENIED"));
+
+        // Upload document
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "ack.txt", "text/plain", "Official RTI Receipt 2026".getBytes());
+
+        mockMvc.perform(multipart("/api/cases/" + created.getId() + "/documents")
+                        .file(file)
+                        .param("category", "acknowledgment"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.document.fileName").value("ack.txt"))
+                .andExpect(jsonPath("$.extractedText", containsString("Official RTI Receipt 2026")));
+
+        // Export Case PDF
+        mockMvc.perform(get("/api/cases/" + created.getId() + "/pdf"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Content-Type", containsString("application/pdf")));
     }
 }

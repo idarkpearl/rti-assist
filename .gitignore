@@ -61,3 +61,9 @@ desktop.ini
 /prach1.mp3
 rti-assist-backend-node-backup/
 
+# Runtime H2 database & user uploads
+*.mv.db
+*.trace.db
+rti-assist-backend/uploads/
+
+

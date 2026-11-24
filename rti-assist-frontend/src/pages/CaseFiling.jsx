@@ -104,24 +104,8 @@ export const CaseFiling = () => {
       const newCaseId = `case-${Date.now().toString().slice(-4)}`;
       const filingIso = new Date(filingDate).toISOString();
 
-      // Build document array if user uploaded an acknowledgment file
-      const documents = selectedFile
-        ? [
-            {
-              id: `doc-${Date.now()}`,
-              caseId: newCaseId,
-              fileName: selectedFile.name,
-              fileSize: selectedFile.size,
-              mimeType: selectedFile.type || 'application/pdf',
-              fileUrl: '#',
-              category: 'acknowledgment',
-              uploadedAt: new Date().toISOString(),
-            },
-          ]
-        : [];
-
       // Call api.createCase() as requested
-      const createdCase = await api.createCase({
+      let createdCase = await api.createCase({
         id: newCaseId,
         trackingNumber: registrationNumber.trim(),
         title: concern.slice(0, 80) || 'RTI Application',
@@ -146,8 +130,22 @@ export const CaseFiling = () => {
         submissionMode: 'online_portal',
         feePaid: authority.applicationFee || 10,
         paymentReference: `REG-${registrationNumber.trim()}`,
-        documents,
       });
+
+      // Upload actual acknowledgment file to backend database/storage if attached
+      if (selectedFile && createdCase?.id) {
+        try {
+          const uploadRes = await api.uploadCaseDocument(createdCase.id, selectedFile, 'acknowledgment');
+          if (uploadRes?.document) {
+            createdCase = {
+              ...createdCase,
+              documents: [...(createdCase.documents || []), uploadRes.document],
+            };
+          }
+        } catch (uploadErr) {
+          console.warn('Document upload failed after case creation:', uploadErr);
+        }
+      }
 
       // Update store so dashboard & cache reflect the case immediately
       addCase(createdCase);

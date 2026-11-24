@@ -4,9 +4,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.rtiassist.dto.AuthorityRecommendationResponse;
 import org.rtiassist.exception.ApiException;
 import org.rtiassist.model.*;
-import org.rtiassist.repository.JsonDataStore;
+import org.rtiassist.service.CaseService;
 import org.rtiassist.service.GeminiService;
+import org.rtiassist.service.PdfExportService;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,20 +21,29 @@ import java.util.Map;
 @RequestMapping("/api/cases")
 public class CaseController {
 
-    private final JsonDataStore dataStore;
+    private final CaseService caseService;
     private final GeminiService geminiService;
+    private final PdfExportService pdfExportService;
 
-    public CaseController(JsonDataStore dataStore, GeminiService geminiService) {
-        this.dataStore = dataStore;
+    public CaseController(CaseService caseService, GeminiService geminiService, PdfExportService pdfExportService) {
+        this.caseService = caseService;
         this.geminiService = geminiService;
+        this.pdfExportService = pdfExportService;
+    }
+
+    private String getUserId(HttpServletRequest request) {
+        User authUser = (User) request.getAttribute("currentUser");
+        return (authUser != null) ? authUser.getId() : null;
     }
 
     @GetMapping
     public ResponseEntity<List<CaseItem>> listCases(
             @RequestParam(required = false) String status,
-            @RequestParam(required = false) String search
+            @RequestParam(required = false) String search,
+            HttpServletRequest request
     ) {
-        List<CaseItem> list = dataStore.getCases(status, search);
+        String userId = getUserId(request);
+        List<CaseItem> list = caseService.listCases(userId, status, search);
         return ResponseEntity.ok(list);
     }
 
@@ -46,8 +58,9 @@ public class CaseController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CaseItem> getCase(@PathVariable String id) {
-        CaseItem c = dataStore.getCaseById(id);
+    public ResponseEntity<CaseItem> getCase(@PathVariable String id, HttpServletRequest request) {
+        String userId = getUserId(request);
+        CaseItem c = caseService.getCaseById(id, userId);
         if (c == null) {
             throw new ApiException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Case not found with id: " + id);
         }
@@ -57,17 +70,23 @@ public class CaseController {
     @PostMapping
     public ResponseEntity<CaseItem> createCase(@RequestBody CaseItem data, HttpServletRequest request) {
         User authUser = (User) request.getAttribute("currentUser");
+        String userId = (authUser != null) ? authUser.getId() : null;
         if (authUser != null && data.getApplicant() == null) {
             data.setApplicant(new ApplicantInfo(authUser.getName(), authUser.getEmail()));
         }
 
-        CaseItem created = dataStore.createCase(data);
+        CaseItem created = caseService.createCase(data, userId);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<CaseItem> updateCase(@PathVariable String id, @RequestBody CaseItem updates) {
-        CaseItem updated = dataStore.updateCase(id, updates);
+    public ResponseEntity<CaseItem> updateCase(
+            @PathVariable String id,
+            @RequestBody CaseItem updates,
+            HttpServletRequest request
+    ) {
+        String userId = getUserId(request);
+        CaseItem updated = caseService.updateCase(id, updates, userId);
         if (updated == null) {
             throw new ApiException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Case not found with id: " + id);
         }
@@ -75,8 +94,9 @@ public class CaseController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Map<String, Object>> deleteCase(@PathVariable String id) {
-        boolean removed = dataStore.deleteCase(id);
+    public ResponseEntity<Map<String, Object>> deleteCase(@PathVariable String id, HttpServletRequest request) {
+        String userId = getUserId(request);
+        boolean removed = caseService.deleteCase(id, userId);
         if (!removed) {
             throw new ApiException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Case not found with id: " + id);
         }
@@ -84,38 +104,46 @@ public class CaseController {
     }
 
     @GetMapping("/{id}/appeals")
-    public ResponseEntity<List<Appeal>> getCaseAppeals(@PathVariable String id) {
-        CaseItem c = dataStore.getCaseById(id);
+    public ResponseEntity<List<Appeal>> getCaseAppeals(@PathVariable String id, HttpServletRequest request) {
+        String userId = getUserId(request);
+        CaseItem c = caseService.getCaseById(id, userId);
         if (c == null) {
             throw new ApiException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Case not found with id: " + id);
         }
-        return ResponseEntity.ok(dataStore.getAppeals(id));
+        return ResponseEntity.ok(c.getAppeals() != null ? c.getAppeals() : Collections.emptyList());
     }
 
     @GetMapping("/{id}/deadlines")
-    public ResponseEntity<List<Deadline>> getCaseDeadlines(@PathVariable String id) {
-        CaseItem c = dataStore.getCaseById(id);
+    public ResponseEntity<List<Deadline>> getCaseDeadlines(@PathVariable String id, HttpServletRequest request) {
+        String userId = getUserId(request);
+        CaseItem c = caseService.getCaseById(id, userId);
         if (c == null) {
             throw new ApiException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Case not found with id: " + id);
         }
-        return ResponseEntity.ok(dataStore.getDeadlines(id, null));
+        return ResponseEntity.ok(c.getDeadlines() != null ? c.getDeadlines() : Collections.emptyList());
     }
 
     @GetMapping("/{id}/documents")
-    public ResponseEntity<List<CaseDocument>> getCaseDocuments(@PathVariable String id) {
-        CaseItem c = dataStore.getCaseById(id);
+    public ResponseEntity<List<CaseDocument>> getCaseDocuments(@PathVariable String id, HttpServletRequest request) {
+        String userId = getUserId(request);
+        CaseItem c = caseService.getCaseById(id, userId);
         if (c == null) {
             throw new ApiException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Case not found with id: " + id);
         }
         return ResponseEntity.ok(c.getDocuments() != null ? c.getDocuments() : Collections.emptyList());
     }
 
-    @PostMapping("/{id}/documents")
-    public ResponseEntity<CaseDocument> addDocument(@PathVariable String id, @RequestBody CaseDocument docData) {
-        CaseDocument doc = dataStore.addDocumentToCase(id, docData);
-        if (doc == null) {
+    @GetMapping("/{id}/pdf")
+    public ResponseEntity<byte[]> exportCasePdf(@PathVariable String id, HttpServletRequest request) {
+        String userId = getUserId(request);
+        CaseItem c = caseService.getCaseById(id, userId);
+        if (c == null) {
             throw new ApiException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Case not found with id: " + id);
         }
-        return new ResponseEntity<>(doc, HttpStatus.CREATED);
+        byte[] pdf = pdfExportService.generateCasePdf(c);
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"RTI_" + id + ".pdf\"")
+                .body(pdf);
     }
 }

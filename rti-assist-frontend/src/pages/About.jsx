@@ -173,7 +173,7 @@ export const About = () => {
               "Hi there! I'm Prachi Mehra, Backend & Systems Engineer.",
               "I specialize in Java, Spring Boot, high-reliability APIs & databases!",
               "B.Tech CSE at DSEU (CGPA 8.4) — precision in logic, elegance in design.",
-              "Yash made sure my avatar looks as gorgeous as my clean code! ✨"
+              "Click anywhere on me to look around or inspect my skills!"
             ]}
             skin="#f6d7c2"
             accent="#10b981"

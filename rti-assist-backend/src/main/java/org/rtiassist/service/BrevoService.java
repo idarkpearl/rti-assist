@@ -3,8 +3,10 @@ package org.rtiassist.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.rtiassist.config.DotenvConfig;
 import org.rtiassist.dto.AuthResponse;
-import org.rtiassist.model.OtpRecord;
+import org.rtiassist.entity.OtpRecordEntity;
+import org.rtiassist.repository.OtpRecordRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -13,22 +15,22 @@ import java.net.http.HttpResponse;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class BrevoService {
 
     private final DotenvConfig dotenvConfig;
+    private final OtpRecordRepository otpRecordRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final HttpClient httpClient = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(10))
             .build();
 
-    private final Map<String, OtpRecord> otpStore = new ConcurrentHashMap<>();
     private final SecureRandom secureRandom = new SecureRandom();
 
-    public BrevoService(DotenvConfig dotenvConfig) {
+    public BrevoService(DotenvConfig dotenvConfig, OtpRecordRepository otpRecordRepository) {
         this.dotenvConfig = dotenvConfig;
+        this.otpRecordRepository = otpRecordRepository;
     }
 
     public String generateOtp() {
@@ -36,12 +38,13 @@ public class BrevoService {
         return String.valueOf(code);
     }
 
+    @Transactional
     public AuthResponse createAndSendOtp(String email, String name) {
         String normalizedEmail = email.toLowerCase().trim();
         long now = System.currentTimeMillis();
 
         // Rate limit: 30 seconds
-        OtpRecord existing = otpStore.get(normalizedEmail);
+        OtpRecordEntity existing = otpRecordRepository.findById(normalizedEmail).orElse(null);
         if (existing != null && (now - existing.getCreatedAt()) < 30 * 1000) {
             long waitSeconds = ((30 * 1000 - (now - existing.getCreatedAt())) / 1000) + 1;
             AuthResponse resp = new AuthResponse();
@@ -54,7 +57,7 @@ public class BrevoService {
         long expiresInMinutes = 10;
         long expiresAt = now + expiresInMinutes * 60 * 1000;
 
-        otpStore.put(normalizedEmail, new OtpRecord(otp, expiresAt, 0, now));
+        otpRecordRepository.save(new OtpRecordEntity(normalizedEmail, otp, expiresAt, 0, now));
         System.out.println("[Brevo Service] \uD83D\uDD11 [OTP DISPATCH] Email: " + normalizedEmail + " | Code: " + otp);
 
         boolean sent = sendOtpEmail(normalizedEmail, (name != null && !name.isBlank()) ? name : "Citizen", otp, expiresInMinutes);
@@ -62,7 +65,9 @@ public class BrevoService {
         AuthResponse resp = new AuthResponse();
         resp.setSuccess(true);
         resp.setSentViaBrevo(sent);
-        resp.setDevOtp(otp); // Available in development/demo mode
+        if (dotenvConfig.isAppDevMode()) {
+            resp.setDevOtp(otp); // Available in development/demo mode
+        }
         resp.setMessage(sent
                 ? "Verification OTP sent to " + normalizedEmail
                 : "OTP generated for " + normalizedEmail + " (logged to backend console)");
@@ -133,9 +138,10 @@ public class BrevoService {
         }
     }
 
+    @Transactional
     public Map<String, Object> verifyOtp(String email, String enteredOtp) {
         String normalizedEmail = email.toLowerCase().trim();
-        OtpRecord record = otpStore.get(normalizedEmail);
+        OtpRecordEntity record = otpRecordRepository.findById(normalizedEmail).orElse(null);
 
         Map<String, Object> result = new HashMap<>();
         if (record == null) {
@@ -145,14 +151,14 @@ public class BrevoService {
         }
 
         if (System.currentTimeMillis() > record.getExpiresAt()) {
-            otpStore.remove(normalizedEmail);
+            otpRecordRepository.deleteById(normalizedEmail);
             result.put("valid", false);
             result.put("message", "This OTP has expired. Please request a new one.");
             return result;
         }
 
         if (record.getAttempts() >= 5) {
-            otpStore.remove(normalizedEmail);
+            otpRecordRepository.deleteById(normalizedEmail);
             result.put("valid", false);
             result.put("message", "Too many incorrect attempts. Please request a new OTP code.");
             return result;
@@ -161,6 +167,7 @@ public class BrevoService {
         String cleanEntered = (enteredOtp != null) ? enteredOtp.trim() : "";
         if (!cleanEntered.equals(record.getOtp())) {
             record.setAttempts(record.getAttempts() + 1);
+            otpRecordRepository.save(record);
             int remaining = 5 - record.getAttempts();
             result.put("valid", false);
             result.put("message", "Invalid OTP code. " + remaining + " attempt" + (remaining != 1 ? "s" : "") + " remaining.");
@@ -168,7 +175,7 @@ public class BrevoService {
         }
 
         // Successfully verified
-        otpStore.remove(normalizedEmail);
+        otpRecordRepository.deleteById(normalizedEmail);
         result.put("valid", true);
         result.put("message", "OTP verified successfully.");
         return result;
